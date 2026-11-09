@@ -1,0 +1,120 @@
+@use '../../styles/variables' as *;
+
+.footer {
+  background-color: $surface;
+  border-top: 1px solid $border-color;
+  padding-top: $space-16;
+  margin-top: auto;
+
+  &__container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $space-10;
+
+    @media (min-width: $breakpoint-md) {
+      grid-template-columns: 2fr 1fr 1fr;
+    }
+  }
+
+  &__brand-col {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  &__logo-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: $primary-gradient;
+    border-radius: $radius-sm;
+    color: $text-inverse;
+  }
+
+  &__brand-name {
+    font-size: $font-size-xl;
+    font-weight: 800;
+    color: $secondary;
+  }
+
+  &__description {
+    color: $text-secondary;
+    font-size: $font-size-sm;
+    line-height: 1.6;
+    max-width: 420px;
+  }
+
+  &__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+    margin-top: $space-2;
+  }
+
+  &__heading {
+    font-size: $font-size-sm;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $secondary;
+    margin-bottom: $space-4;
+  }
+
+  &__link-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+
+    li a {
+      color: $text-secondary;
+      font-size: $font-size-sm;
+      transition: color $transition-fast;
+
+      &:hover {
+        color: $primary;
+      }
+    }
+  }
+
+  &__bottom {
+    margin-top: $space-12;
+    padding: $space-6 0;
+    border-top: 1px solid $border-color;
+    background-color: $surface-alt;
+  }
+
+  &__bottom-container {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+    align-items: center;
+    justify-content: space-between;
+
+    @media (min-width: $breakpoint-sm) {
+      flex-direction: row;
+    }
+  }
+
+  &__copyright,
+  &__crafted {
+    font-size: $font-size-xs;
+    color: $text-muted;
+  }
+
+  &__heart {
+    display: inline;
+    vertical-align: middle;
+    color: $danger;
+    fill: $danger;
+    margin: 0 2px;
+  }
+}

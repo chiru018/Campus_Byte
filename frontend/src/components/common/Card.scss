@@ -1,0 +1,18 @@
+@use '../../styles/variables' as *;
+
+.card {
+  background-color: $surface;
+  border-radius: $radius-lg;
+  border: 1px solid $border-color;
+  padding: $space-6;
+  box-shadow: $shadow-sm;
+  transition: all $transition-normal;
+
+  &--hoverable {
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: $shadow-xl;
+      border-color: rgba($primary, 0.3);
+    }
+  }
+}

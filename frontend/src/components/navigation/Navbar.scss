@@ -1,0 +1,126 @@
+@use '../../styles/variables' as *;
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: rgba($surface, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid $border-color;
+  transition: all $transition-normal;
+
+  &__container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    font-weight: 800;
+    font-size: $font-size-xl;
+    letter-spacing: -0.02em;
+    color: $secondary;
+  }
+
+  &__logo-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    background: $primary-gradient;
+    border-radius: $radius-md;
+    color: $text-inverse;
+    box-shadow: $shadow-orange;
+  }
+
+  &__logo-text {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+  }
+
+  &__logo-highlight {
+    color: $primary;
+  }
+
+  &__links {
+    display: none;
+    align-items: center;
+    gap: $space-8;
+
+    @media (min-width: $breakpoint-md) {
+      display: flex;
+    }
+  }
+
+  &__link {
+    font-size: $font-size-sm;
+    font-weight: 500;
+    color: $text-secondary;
+    position: relative;
+    padding: $space-1 0;
+
+    &:hover {
+      color: $primary;
+    }
+  }
+
+  &__actions {
+    display: none;
+    align-items: center;
+    gap: $space-3;
+
+    @media (min-width: $breakpoint-md) {
+      display: flex;
+    }
+  }
+
+  &__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $space-2;
+    color: $text-main;
+
+    @media (min-width: $breakpoint-md) {
+      display: none;
+    }
+  }
+
+  &__mobile-menu {
+    background-color: $surface;
+    border-bottom: 1px solid $border-color;
+    padding: $space-6 $space-4;
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+
+    @media (min-width: $breakpoint-md) {
+      display: none;
+    }
+  }
+
+  &__mobile-link {
+    font-size: $font-size-base;
+    font-weight: 600;
+    color: $text-main;
+    padding: $space-2 0;
+  }
+
+  &__mobile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+    padding-top: $space-4;
+    border-top: 1px solid $border-color;
+
+    .btn--full {
+      width: 100%;
+    }
+  }
+}
