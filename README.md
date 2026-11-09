@@ -249,3 +249,4 @@ When Docker Desktop is installed:
 
 - `.gitignore` is pre-configured to exclude all virtual environments (`.venv/`), Node modules (`node_modules/`), build outputs (`dist/`), environment secrets (`.env`), and temporary caches.
 - Changes should be committed on modular feature branches following Phase 1 completion.
+

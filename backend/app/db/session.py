@@ -52,3 +52,4 @@ def check_db_connection() -> dict:
             "connected": False,
             "message": f"Database connection failed: {str(exc)}",
         }
+
