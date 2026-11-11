@@ -56,3 +56,4 @@ def delivery_partner_only_endpoint(
         "role": current_user.role.value,
         "user_id": current_user.id,
     }
+

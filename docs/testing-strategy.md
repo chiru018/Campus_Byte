@@ -36,3 +36,4 @@ To prevent destructive modification to development and production PostgreSQL dat
 # Run only authentication and RBAC tests
 .\.venv\Scripts\pytest.exe backend/tests/test_auth_and_rbac.py -v
 ```
+

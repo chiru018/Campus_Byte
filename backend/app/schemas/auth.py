@@ -84,3 +84,4 @@ class AuthMeResponse(BaseModel):
 
     class Config:
         from_attributes = True
+

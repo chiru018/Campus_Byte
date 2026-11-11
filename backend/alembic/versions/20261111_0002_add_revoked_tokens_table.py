@@ -37,3 +37,4 @@ def downgrade() -> None:
     op.drop_index("ix_revoked_tokens_user_id", table_name="revoked_tokens")
     op.drop_index("ix_revoked_tokens_jti", table_name="revoked_tokens")
     op.drop_table("revoked_tokens")
+

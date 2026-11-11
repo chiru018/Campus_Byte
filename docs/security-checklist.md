@@ -19,3 +19,4 @@ This document audits the security controls implemented in **Campus Byte** agains
 | **CORS Configuration** | Restricted to explicit development and production origins (`http://localhost:5173`, `http://127.0.0.1:5173`). Wildcard `*` rejected. | Configured in `app.core.config.Settings.BACKEND_CORS_ORIGINS`. | ✅ PASS |
 | **Transaction Safety** | Multi-table registration (Owner + Restaurant, Courier + DeliveryPartner) wrapped in database transactions with rollback on failure. | Verified via `test_register_restaurant_owner_success`. | ✅ PASS |
 | **Secret Management** | All credentials (`JWT_SECRET_KEY`, `DATABASE_URL`) loaded from environment variables. `.env` strictly ignored by Git. | Verified in `.gitignore`. | ✅ PASS |
+

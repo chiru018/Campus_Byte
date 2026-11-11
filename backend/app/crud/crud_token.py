@@ -35,3 +35,4 @@ def cleanup_expired_revoked_tokens(db: Session) -> int:
     result = db.execute(delete(RevokedToken).where(RevokedToken.expires_at < now))
     db.commit()
     return result.rowcount
+

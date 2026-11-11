@@ -133,3 +133,4 @@ def logout_endpoint(
         "message": "Successfully logged out. Session has been revoked.",
         "user_id": current_user.id,
     }
+

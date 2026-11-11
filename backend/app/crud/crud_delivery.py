@@ -29,3 +29,4 @@ def create_delivery_partner_profile(
     db.commit()
     db.refresh(partner)
     return partner
+

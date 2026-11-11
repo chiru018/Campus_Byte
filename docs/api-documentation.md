@@ -127,3 +127,4 @@ All domain exceptions return uniform JSON structures:
   "extra": null
 }
 ```
+

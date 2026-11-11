@@ -33,3 +33,4 @@ def require_roles(*roles: UserRole) -> Callable:
 require_customer = RoleChecker([UserRole.CUSTOMER])
 require_restaurant_owner = RoleChecker([UserRole.RESTAURANT_OWNER])
 require_delivery_partner = RoleChecker([UserRole.DELIVERY_PARTNER])
+

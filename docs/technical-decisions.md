@@ -54,3 +54,4 @@ This document records the critical architectural and security decisions made dur
 - **Decision:** Support both `Authorization: Bearer <token>` and `campus_byte_access_token` HttpOnly cookie.
 - **Consequences:**
   - *Pros:* Web browsers enjoy HttpOnly protection from JavaScript cookie extraction, while API clients and automated tests can pass standard Bearer headers.
+

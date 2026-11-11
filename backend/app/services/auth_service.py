@@ -183,3 +183,4 @@ def logout_user(db: Session, token: str) -> None:
         pass
     except jwt.InvalidTokenError:
         raise AuthenticationException("Invalid token provided for logout.")
+

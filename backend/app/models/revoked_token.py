@@ -42,3 +42,4 @@ class RevokedToken(Base):
 
     def __repr__(self) -> str:
         return f"<RevokedToken jti={self.jti} user_id={self.user_id}>"
+

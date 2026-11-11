@@ -93,3 +93,4 @@ The platform strictly differentiates three participant types:
    - `ProtectedRoute`: Evaluates role membership; redirects unauthenticated visitors to `/login` with target path preserved, and unauthorized roles to `/unauthorized`.
 3. **Decoupled API Client:**
    - Axios instance with interceptors attaching Bearer tokens and managing 401 unauthenticated purges.
+
