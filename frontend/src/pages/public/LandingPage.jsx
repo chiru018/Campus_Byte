@@ -73,7 +73,7 @@ export default function LandingPage() {
         'Student-friendly pricing and transparent fees',
       ],
       ctaText: 'Start Ordering',
-      ctaLink: '/register?role=customer',
+      ctaLink: '/register/customer',
     },
     {
       id: 'restaurant',
@@ -88,7 +88,7 @@ export default function LandingPage() {
         'Detailed sales metrics and peak-hour analytics',
       ],
       ctaText: 'Partner With Us',
-      ctaLink: '/register?role=restaurant',
+      ctaLink: '/register/restaurant-owner',
     },
     {
       id: 'delivery',
@@ -103,7 +103,7 @@ export default function LandingPage() {
         'Smart campus routing optimized for building entrances',
       ],
       ctaText: 'Become a Courier',
-      ctaLink: '/register?role=delivery',
+      ctaLink: '/register/delivery-partner',
     },
   ];
 
@@ -159,7 +159,7 @@ export default function LandingPage() {
             </p>
 
             <div className="hero__actions">
-              <Link to="/register">
+              <Link to="/register/customer">
                 <Button variant="primary" size="lg" icon={ArrowRight}>
                   Explore Menus
                 </Button>

@@ -8,6 +8,7 @@ erDiagram
     USERS ||--o| DELIVERY_PARTNERS : "profile (1:1)"
     USERS ||--o{ ORDERS : "places as customer"
     USERS ||--o{ ORDER_STATUS_HISTORY : "changed_by"
+    USERS ||--o{ REVOKED_TOKENS : "revoked sessions"
 
     RESTAURANTS ||--o{ MENU_ITEMS : "offers"
     RESTAURANTS ||--o{ ORDERS : "receives"
@@ -111,6 +112,14 @@ erDiagram
         string new_status
         uuid changed_by FK
         timestamp created_at
+    }
+
+    REVOKED_TOKENS {
+        uuid id PK
+        string jti UK
+        uuid user_id FK
+        timestamp revoked_at
+        timestamp expires_at
     }
 ```
 

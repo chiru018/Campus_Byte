@@ -176,3 +176,16 @@ Immutable audit log tracking every order state transition.
 | `changed_by` | `UUID` | Yes | `FOREIGN KEY(users.id)`, `INDEX` | User triggering transition |
 | `created_at` | `TIMESTAMPTZ` | No | `server_default=NOW()` | Audit log timestamp |
 
+---
+
+### Table 9: `revoked_tokens`
+Server-side token denylist tracking revoked JWT identifiers (jti) upon explicit user logout.
+
+| Column | Type | Nullable | Constraints & Defaults | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `id` | `UUID` | No | `PRIMARY KEY`, `default=uuid4` | Revocation identifier |
+| `jti` | `VARCHAR(64)` | No | `UNIQUE`, `INDEX` | JWT unique token identifier |
+| `user_id` | `UUID` | No | `FOREIGN KEY(users.id)`, `INDEX` | User owning the revoked token |
+| `revoked_at` | `TIMESTAMPTZ` | No | `server_default=NOW()` | Exact revocation timestamp |
+| `expires_at` | `TIMESTAMPTZ` | No | `INDEX` | Token expiration timestamp for cleanup |
+

@@ -1,0 +1,191 @@
+@use '../../styles/variables' as *;
+
+.auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-12 $space-4;
+  min-height: calc(100vh - 160px);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 480px;
+  background-color: $surface;
+  border-radius: $radius-xl;
+  border: 1px solid $border-color;
+  padding: $space-8;
+  box-shadow: $shadow-xl;
+
+  &--wide {
+    max-width: 560px;
+  }
+
+  &__header {
+    text-align: center;
+    margin-bottom: $space-8;
+  }
+
+  &__badge-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: $radius-lg;
+    background: $primary-light;
+    color: $primary;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: $space-4;
+  }
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: 800;
+    color: $secondary;
+    letter-spacing: -0.02em;
+    margin-bottom: $space-2;
+  }
+
+  &__subtitle {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+  }
+
+  &__alert {
+    padding: $space-3 $space-4;
+    border-radius: $radius-md;
+    font-size: $font-size-sm;
+    display: flex;
+    align-items: flex-start;
+    gap: $space-2;
+    margin-bottom: $space-6;
+
+    &--error {
+      background-color: #FEF2F2;
+      border: 1px solid #FCA5A5;
+      color: #991B1B;
+    }
+
+    &--success {
+      background-color: #ECFDF5;
+      border: 1px solid #6EE7B7;
+      color: #065F46;
+    }
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  &__label {
+    font-size: $font-size-xs;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $secondary;
+  }
+
+  &__input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 0.65rem $space-4;
+    font-size: $font-size-sm;
+    font-family: inherit;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    background-color: $surface;
+    color: $text-main;
+    transition: all $transition-fast;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba($primary, 0.15);
+    }
+
+    &--has-icon-right {
+      padding-right: 2.75rem;
+    }
+  }
+
+  &__select {
+    width: 100%;
+    padding: 0.65rem $space-4;
+    font-size: $font-size-sm;
+    font-family: inherit;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    background-color: $surface;
+    color: $text-main;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba($primary, 0.15);
+    }
+  }
+
+  &__icon-btn {
+    position: absolute;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    color: $text-muted;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      color: $text-main;
+    }
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $space-4;
+
+    @media (min-width: $breakpoint-sm) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  &__footer {
+    text-align: center;
+    margin-top: $space-6;
+    padding-top: $space-6;
+    border-top: 1px solid $border-color;
+    font-size: $font-size-sm;
+    color: $text-secondary;
+
+    a {
+      color: $primary;
+      font-weight: 600;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  &__role-options {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    margin-top: $space-3;
+  }
+}

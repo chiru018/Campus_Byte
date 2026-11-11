@@ -10,6 +10,17 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@localhost:5432/campus_byte"
 
+    # Security & JWT
+    JWT_SECRET_KEY: str = "dev_super_secret_jwt_key_campus_byte_2026_change_in_production"
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
+    # Cookie Security Settings
+    AUTH_COOKIE_NAME: str = "campus_byte_access_token"
+    COOKIE_SECURE: bool = False
+    COOKIE_SAMESITE: str = "lax"
+    COOKIE_HTTPONLY: bool = True
+
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:5173",

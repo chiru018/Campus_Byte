@@ -14,6 +14,7 @@ from app.models.order import Order
 from app.models.order_item import OrderItem
 from app.models.delivery_assignment import DeliveryAssignment
 from app.models.order_status_history import OrderStatusHistory
+from app.models.revoked_token import RevokedToken
 
 __all__ = [
     "UserRole",
@@ -30,5 +31,6 @@ __all__ = [
     "OrderItem",
     "DeliveryAssignment",
     "OrderStatusHistory",
+    "RevokedToken",
 ]
 

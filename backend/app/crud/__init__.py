@@ -23,8 +23,22 @@ from app.crud.crud_menu import (
     set_menu_item_availability,
     remove_or_deactivate_menu_item,
 )
+from app.crud.crud_token import (
+    revoke_token,
+    is_token_revoked,
+    cleanup_expired_revoked_tokens,
+)
+from app.crud.crud_delivery import (
+    get_delivery_partner_by_user_id,
+    create_delivery_partner_profile,
+)
 
 __all__ = [
+    "revoke_token",
+    "is_token_revoked",
+    "cleanup_expired_revoked_tokens",
+    "get_delivery_partner_by_user_id",
+    "create_delivery_partner_profile",
     "get_user_by_id",
     "get_user_by_email",
     "get_users",

@@ -4,13 +4,21 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.exceptions import CampusByteException
-from app.api.routers import restaurants, menu, users, dashboards, system
+from app.api.routers import (
+    auth,
+    restaurants,
+    menu,
+    users,
+    dashboards,
+    system,
+    protected_routes,
+)
 
 # Application initialization
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.API_VERSION,
-    description="Campus Byte - Food Delivery Platform API (Phase 2 Database & Backend)",
+    description="Campus Byte - Food Delivery Platform API (Phase 3 Complete Authentication & RBAC)",
     docs_url="/docs",
     redoc_url="/redoc",
 )
@@ -37,6 +45,8 @@ app.add_middleware(
 )
 
 # Modular API Routers mounted under /api
+app.include_router(auth.router, prefix="/api")
+app.include_router(protected_routes.router, prefix="/api")
 app.include_router(restaurants.router, prefix="/api")
 app.include_router(menu.router, prefix="/api")
 app.include_router(users.router, prefix="/api")

@@ -40,8 +40,22 @@ from app.schemas.delivery import (
     DeliveryPartnerResponse,
     DeliveryAssignmentResponse,
 )
+from app.schemas.auth import (
+    CustomerRegisterRequest,
+    RestaurantOwnerRegisterRequest,
+    DeliveryPartnerRegisterRequest,
+    LoginRequest,
+    TokenResponse,
+    AuthMeResponse,
+)
 
 __all__ = [
+    "CustomerRegisterRequest",
+    "RestaurantOwnerRegisterRequest",
+    "DeliveryPartnerRegisterRequest",
+    "LoginRequest",
+    "TokenResponse",
+    "AuthMeResponse",
     "UserBase",
     "UserCreate",
     "UserUpdate",

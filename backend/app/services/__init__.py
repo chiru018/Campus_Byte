@@ -1,3 +1,10 @@
+from app.services.auth_service import (
+    register_customer,
+    register_restaurant_owner,
+    register_delivery_partner,
+    authenticate_user,
+    logout_user,
+)
 from app.services.user_service import (
     register_user,
     fetch_user_by_id,
@@ -22,6 +29,11 @@ from app.services.menu_service import (
 )
 
 __all__ = [
+    "register_customer",
+    "register_restaurant_owner",
+    "register_delivery_partner",
+    "authenticate_user",
+    "logout_user",
     "register_user",
     "fetch_user_by_id",
     "fetch_users",
