@@ -225,3 +225,62 @@
   - If item appears in historical orders (`order_items`), sets `is_available = False` to protect historical audit trails.
   - If no historical orders reference it, deletes record from database.
 - **Status:** `200 OK` / `403 Forbidden`
+
+---
+
+## 4. Order & Checkout Endpoints (`/api/orders`)
+
+### 4.1 Place Food Order
+- **Endpoint:** `POST /api/orders`
+- **Access:** `CUSTOMER` role only
+- **Status:** `201 Created`
+- **Security & Integrity Controls:**
+  - **Server-Side Price Computation:** Client prices are strictly ignored. The server looks up live prices from `menu_items`, verifies `is_available=True` and restaurant `is_open=True`, and sums `unit_price * quantity`.
+  - **Delivery Fee:** Flat \$2.00 fee automatically applied by backend.
+  - **Idempotency Protection:** If `idempotency_key` is supplied, duplicate submissions within 24 hours safely return the existing order without creating duplicate orders.
+  - **Single Restaurant Verification:** Validates that all items belong to the requested restaurant.
+- **Request Body:**
+  ```json
+  {
+    "restaurant_id": "8f8b6567-0c79-4a0d-b4f0-4a8b7c7b2a1a",
+    "delivery_address": "Hostel B, Room 304, Campus North (Landmark: Near elevator) | Recipient: Alex (+1555123456)",
+    "payment_method": "CASH_ON_DELIVERY",
+    "items": [
+      {
+        "menu_item_id": "3c9d74e2-6d27-4bf3-a09c-2f9b8c9a1d2e",
+        "quantity": 2
+      }
+    ],
+    "idempotency_key": "cb-order-1699999999-a1b2c3d4"
+  }
+  ```
+- **Response Body:** `OrderResponse` including calculated `subtotal`, `delivery_fee`, `total_amount`, `order_status` (`PENDING`), `payment_status` (`PENDING`), snapshot line items, and initial status history.
+
+### 4.2 Get Customer Order History
+- **Endpoint:** `GET /api/orders/my-orders`
+- **Access:** `CUSTOMER` role only
+- **Query Parameters:**
+  - `page`: Page number (default: 1)
+  - `size`: Page size (default: 20)
+  - `status`: Optional filter by `OrderStatus` (`PENDING`, `ACCEPTED`, `PREPARING`, `OUT_FOR_DELIVERY`, `DELIVERED`, `CANCELLED`)
+- **Status:** `200 OK`
+- **Response Body:** `OrderListResponse` with list of user's orders and total count.
+
+### 4.3 Get Order Detail & Tracking
+- **Endpoint:** `GET /api/orders/{order_id}`
+- **Access:** `CUSTOMER` role only (Owner check: customer must own this order)
+- **Status:** `200 OK` / `403 Forbidden` / `404 Not Found`
+- **Response Body:** `OrderResponse` with items snapshot, restaurant name, and full `status_history` timeline.
+
+### 4.4 Cancel Pending Order
+- **Endpoint:** `PATCH /api/orders/{order_id}/cancel`
+- **Access:** `CUSTOMER` role only (Owner check: customer must own this order)
+- **Status:** `200 OK` / `400 Bad Request` / `403 Forbidden`
+- **Business Rule:** Only orders in `PENDING` status may be cancelled. Orders that have transitioned to `ACCEPTED`, `PREPARING`, `OUT_FOR_DELIVERY`, or `DELIVERED` cannot be cancelled.
+- **Request Body (Optional):**
+  ```json
+  {
+    "reason": "Placed by mistake"
+  }
+  ```
+- **Response Body:** Updated `OrderResponse` with `order_status: "CANCELLED"` and appended history transition.

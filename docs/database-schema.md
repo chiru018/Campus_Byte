@@ -119,6 +119,7 @@ Core transaction entity linking customer orders with restaurants and couriers.
 | `payment_method` | `VARCHAR(30)` | No | `default='CASH_ON_DELIVERY'` | Enum: `CASH_ON_DELIVERY` |
 | `payment_status` | `VARCHAR(20)` | No | `INDEX`, `default='PENDING'` | Enum: `PENDING`, `PAID`, `FAILED` |
 | `order_status` | `VARCHAR(30)` | No | `INDEX`, `default='PENDING'` | Full order state machine |
+| `idempotency_key` | `VARCHAR(64)` | Yes | `INDEX` | Client-generated duplicate submit token |
 | `created_at` | `TIMESTAMPTZ` | No | `server_default=NOW()` | Timestamp order placed |
 | `updated_at` | `TIMESTAMPTZ` | No | `server_default=NOW()`, `onupdate=NOW()` | Timestamp state updated |
 

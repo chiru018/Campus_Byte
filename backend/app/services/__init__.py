@@ -31,7 +31,20 @@ from app.services.menu_service import (
     get_categories_list,
 )
 
+from app.services.order_service import (
+    place_order,
+    get_my_orders,
+    get_order_detail,
+    cancel_customer_order,
+    STANDARD_DELIVERY_FEE,
+)
+
 __all__ = [
+    "place_order",
+    "get_my_orders",
+    "get_order_detail",
+    "cancel_customer_order",
+    "STANDARD_DELIVERY_FEE",
     "register_customer",
     "register_restaurant_owner",
     "register_delivery_partner",

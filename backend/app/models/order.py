@@ -78,6 +78,9 @@ class Order(Base):
         nullable=False,
         index=True,
     )
+    idempotency_key: Mapped[Optional[str]] = mapped_column(
+        String(64), nullable=True, index=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

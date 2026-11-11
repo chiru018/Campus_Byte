@@ -41,7 +41,7 @@ Campus Byte is a modern, enterprise-grade, full-stack campus food ordering and d
 - **Security & Password Hashing:** Argon2id (`argon2-cffi`) with PBKDF2 backward compatibility
 - **Token Authorization:** PyJWT (HS256) with JTI denylisting
 - **Database Migrations:** Alembic
-- **Testing Suite:** Pytest + HTTPX + SQLAlchemy SQLite in-memory runner (46 automated tests)
+- **Testing Suite:** Pytest + HTTPX + SQLAlchemy SQLite in-memory runner (67 automated tests passing)
 
 ### Database & Infrastructure
 - **Relational Database:** PostgreSQL 17 (installed locally on port `5432`)
@@ -328,7 +328,7 @@ Run the comprehensive automated backend test suite (54 tests):
 .\.venv\Scripts\pytest.exe backend/tests -v
 ```
 
-All 54 test cases cover:
+All 67 test cases cover:
 - Customer, Restaurant Owner, and Delivery Partner registration.
 - Duplicate email prevention and invalid email formatting rejection.
 - Password policy verification (mismatch, weak length, missing requirements).
@@ -343,12 +343,16 @@ All 54 test cases cover:
 - Standard food category validation and filtering.
 - Safe historical record deactivation preserving referential integrity for orders.
 - Schema integrity, positive price constraints, and database relationships.
+- **Phase 5 Order Creation:** Secure server-side pricing derivation using `Decimal` / `Numeric(10, 2)`, closed restaurant rejection, sold-out item rejection, cross-restaurant item rejection.
+- **Phase 5 Idempotency Protection:** Duplicate submission protection via client idempotency token.
+- **Phase 5 Order History & IDOR Protection:** Customer can view and track their orders, with 403 Forbidden enforcement if another customer attempts to access or cancel the order.
+- **Phase 5 Order Cancellation:** Transition from `PENDING` to `CANCELLED` with status history tracking, and strict rejection of cancellation once order has progressed beyond pending.
 
 To verify frontend compilation:
 ```powershell
 npm --prefix frontend run build
 ```
-Builds 1680+ modules cleanly to `frontend/dist/` with zero errors.
+Builds 1694 modules cleanly to `frontend/dist/` with zero errors.
 
 ---
 

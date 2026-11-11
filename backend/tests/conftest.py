@@ -159,3 +159,29 @@ def other_owner_headers(other_owner) -> dict:
     return {"Authorization": f"Bearer {token}"}
 
 
+@pytest.fixture
+def other_customer(db_session) -> User:
+    """Secondary Customer User fixture for IDOR tests."""
+    customer = User(
+        id=uuid.uuid4(),
+        full_name="Bob Student",
+        email="bob.student@campusbyte.com",
+        phone_number="+1999111222",
+        password_hash=get_password_hash("BobSecret123"),
+        role=UserRole.CUSTOMER,
+        is_active=True,
+    )
+    db_session.add(customer)
+    db_session.commit()
+    db_session.refresh(customer)
+    return customer
+
+
+@pytest.fixture
+def other_customer_headers(other_customer) -> dict:
+    """Authorization header fixture for secondary customer."""
+    token, _, _ = create_access_token(other_customer.id, other_customer.role.value)
+    return {"Authorization": f"Bearer {token}"}
+
+
+

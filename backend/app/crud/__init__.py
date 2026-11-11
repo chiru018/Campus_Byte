@@ -33,8 +33,20 @@ from app.crud.crud_delivery import (
     get_delivery_partner_by_user_id,
     create_delivery_partner_profile,
 )
+from app.crud.crud_order import (
+    get_order_by_id,
+    get_order_by_idempotency,
+    get_customer_orders,
+    create_order_atomic,
+    update_order_status,
+)
 
 __all__ = [
+    "get_order_by_id",
+    "get_order_by_idempotency",
+    "get_customer_orders",
+    "create_order_atomic",
+    "update_order_status",
     "revoke_token",
     "is_token_revoked",
     "cleanup_expired_revoked_tokens",

@@ -12,6 +12,12 @@ import RestaurantDetailPage from '../pages/public/RestaurantDetailPage';
 
 import ProtectedRoute from './ProtectedRoute';
 import CustomerDashboard from '../pages/customer/CustomerDashboard';
+import CartPage from '../pages/customer/CartPage';
+import CheckoutPage from '../pages/customer/CheckoutPage';
+import OrderConfirmationPage from '../pages/customer/OrderConfirmationPage';
+import MyOrdersPage from '../pages/customer/MyOrdersPage';
+import OrderTrackingPage from '../pages/customer/OrderTrackingPage';
+
 import RestaurantDashboard from '../pages/restaurant/RestaurantDashboard';
 import RestaurantProfilePage from '../pages/restaurant/RestaurantProfilePage';
 import MenuManagementPage from '../pages/restaurant/MenuManagementPage';
@@ -27,6 +33,7 @@ export default function AppRoutes() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/restaurants" element={<RestaurantListPage />} />
         <Route path="/restaurants/:restaurantId" element={<RestaurantDetailPage />} />
+        <Route path="/cart" element={<CartPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register/customer" element={<CustomerRegisterPage />} />
         <Route path="/register/restaurant-owner" element={<RestaurantOwnerRegisterPage />} />
@@ -36,6 +43,10 @@ export default function AppRoutes() {
         {/* Customer Protected Routes */}
         <Route element={<ProtectedRoute allowedRoles={['CUSTOMER']} />}>
           <Route path="/customer/dashboard" element={<CustomerDashboard />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/order-confirmation/:orderId" element={<OrderConfirmationPage />} />
+          <Route path="/my-orders" element={<MyOrdersPage />} />
+          <Route path="/my-orders/:orderId" element={<OrderTrackingPage />} />
         </Route>
 
         {/* Restaurant Owner Protected Routes */}

@@ -9,14 +9,18 @@ import {
   Store,
   Bike,
   LayoutDashboard,
+  ShoppingCart,
+  Package,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useCart } from '../../context/CartContext';
 import Button from '../common/Button';
 import './Navbar.scss';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, isAuthenticated, logout, getRoleDashboard } = useAuth();
+  const { totalItems } = useCart();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -59,6 +63,11 @@ export default function Navbar() {
 
           {isAuthenticated ? (
             <>
+              {user?.role === 'CUSTOMER' && (
+                <Link to="/my-orders" className="navbar__link">
+                  My Orders
+                </Link>
+              )}
               <Link to={dashboardPath} className="navbar__link">
                 Dashboard
               </Link>
@@ -84,6 +93,48 @@ export default function Navbar() {
 
         {/* Desktop Action Buttons */}
         <div className="navbar__actions">
+          {/* Cart Icon Link */}
+          <Link
+            to="/cart"
+            style={{
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: '#F1F5F9',
+              color: '#334155',
+              transition: 'background-color 0.15s ease',
+              textDecoration: 'none',
+            }}
+            title="View Shopping Cart"
+          >
+            <ShoppingCart size={20} />
+            {totalItems > 0 && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '-4px',
+                  right: '-4px',
+                  backgroundColor: '#F59E0B',
+                  color: '#FFFFFF',
+                  fontSize: '0.75rem',
+                  fontWeight: '800',
+                  borderRadius: '9999px',
+                  padding: '2px 6px',
+                  lineHeight: '1',
+                  minWidth: '18px',
+                  textAlign: 'center',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                }}
+              >
+                {totalItems}
+              </span>
+            )}
+          </Link>
+
           {isAuthenticated ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <Link to={dashboardPath}>
@@ -117,18 +168,64 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Hamburger Toggle */}
-        <button
-          className="navbar__toggle"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle navigation menu"
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }} className="navbar__mobile-actions">
+          {/* Mobile Cart Button */}
+          <Link
+            to="/cart"
+            style={{
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              backgroundColor: '#F1F5F9',
+              color: '#334155',
+              textDecoration: 'none',
+            }}
+          >
+            <ShoppingCart size={19} />
+            {totalItems > 0 && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '-3px',
+                  right: '-3px',
+                  backgroundColor: '#F59E0B',
+                  color: '#FFFFFF',
+                  fontSize: '0.7rem',
+                  fontWeight: '800',
+                  borderRadius: '9999px',
+                  padding: '2px 5px',
+                  lineHeight: '1',
+                }}
+              >
+                {totalItems}
+              </span>
+            )}
+          </Link>
+
+          <button
+            className="navbar__toggle"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="navbar__mobile-menu">
+          <Link
+            to="/cart"
+            className="navbar__mobile-link"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Cart ({totalItems} items)
+          </Link>
           <Link
             to="/restaurants"
             className="navbar__mobile-link"
@@ -144,6 +241,15 @@ export default function Navbar() {
                   Signed in as <strong>{user?.full_name}</strong> ({user?.role})
                 </span>
               </div>
+              {user?.role === 'CUSTOMER' && (
+                <Link
+                  to="/my-orders"
+                  className="navbar__mobile-link"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  My Order History
+                </Link>
+              )}
               <Link
                 to={dashboardPath}
                 className="navbar__mobile-link"

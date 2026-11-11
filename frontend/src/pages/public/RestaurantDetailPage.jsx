@@ -6,11 +6,15 @@ import {
   Phone,
   ArrowLeft,
   UtensilsCrossed,
-  Info,
   Clock,
+  ShoppingCart,
+  Plus,
+  Minus,
+  AlertTriangle,
 } from 'lucide-react';
 import restaurantService from '../../services/restaurantService';
 import menuService from '../../services/menuService';
+import { useCart } from '../../context/CartContext';
 import Button from '../../components/common/Button';
 import './Restaurants.scss';
 
@@ -22,6 +26,19 @@ export default function RestaurantDetailPage() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
+
+  const {
+    restaurant: cartRestaurant,
+    items: cartItems,
+    totalItems,
+    totalAmount,
+    addToCart,
+    updateQuantity,
+    getItemQuantity,
+    conflictModal,
+    confirmRestaurantSwitch,
+    cancelRestaurantSwitch,
+  } = useCart();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,8 +90,10 @@ export default function RestaurantDetailPage() {
     );
   }
 
+  const isCurrentCartRestaurant = cartRestaurant && cartRestaurant.id === restaurant.id;
+
   return (
-    <div className="restaurant-detail-page">
+    <div className="restaurant-detail-page" style={{ paddingBottom: isCurrentCartRestaurant && totalItems > 0 ? '5rem' : '2rem' }}>
       {/* Hero Banner */}
       <div
         className="hero-banner"
@@ -108,33 +127,34 @@ export default function RestaurantDetailPage() {
                 color: restaurant.is_open ? '#A7F3D0' : '#FECACA',
               }}
             >
-              <Clock size={14} /> {restaurant.is_open ? 'Open For Orders' : 'Currently Closed'}
+              <Clock size={14} /> {restaurant.is_open ? 'Open For Delivery' : 'Currently Closed'}
             </span>
           </div>
         </div>
       </div>
 
       <div className="container">
-        {/* Module Notice */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            backgroundColor: '#EFF6FF',
-            border: '1px solid #BFDBFE',
-            padding: '1rem',
-            borderRadius: '0.75rem',
-            color: '#1E40AF',
-            marginBottom: '2rem',
-            fontSize: '0.9rem',
-          }}
-        >
-          <Info size={20} style={{ flexShrink: 0 }} />
-          <span>
-            <strong>Phase 4 Preview:</strong> Menu catalog, pricing, and food categories are live. Online cart ordering and door delivery checkout will launch in Phase 5.
-          </span>
-        </div>
+        {!restaurant.is_open && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              backgroundColor: '#FEF2F2',
+              border: '1px solid #FECACA',
+              padding: '1rem',
+              borderRadius: '0.75rem',
+              color: '#991B1B',
+              marginBottom: '2rem',
+              fontSize: '0.95rem',
+            }}
+          >
+            <AlertTriangle size={20} style={{ flexShrink: 0 }} />
+            <span>
+              <strong>Outlet Currently Closed:</strong> {restaurant.name} is not accepting orders at this time. You can still browse the menu catalog.
+            </span>
+          </div>
+        )}
 
         {/* Category Tabs */}
         <div className="category-tabs">
@@ -168,38 +188,187 @@ export default function RestaurantDetailPage() {
           </div>
         ) : (
           <div className="public-menu-grid">
-            {menuItems.map((dish) => (
-              <div key={dish.id} className="dish-card">
-                <div className="dish-card__image">
-                  {dish.image_url ? (
-                    <img
-                      src={dish.image_url}
-                      alt={dish.name}
-                      onError={(e) => { e.target.style.display = 'none'; }}
-                    />
-                  ) : (
-                    <div className="dish-placeholder">
-                      <UtensilsCrossed size={36} />
+            {menuItems.map((dish) => {
+              const qtyInCart = getItemQuantity(dish.id);
+              return (
+                <div key={dish.id} className="dish-card">
+                  <div className="dish-card__image">
+                    {dish.image_url ? (
+                      <img
+                        src={dish.image_url}
+                        alt={dish.name}
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <div className="dish-placeholder">
+                        <UtensilsCrossed size={36} />
+                      </div>
+                    )}
+                    <span className="category-tag">{dish.category}</span>
+                  </div>
+
+                  <div className="dish-card__details">
+                    <h3>{dish.name}</h3>
+                    <p>{dish.description || 'Prepared fresh upon order with quality ingredients.'}</p>
+
+                    <div className="price-footer">
+                      <span className="price">${parseFloat(dish.price).toFixed(2)}</span>
+
+                      {!restaurant.is_open ? (
+                        <span style={{ fontSize: '0.85rem', color: '#9CA3AF', fontWeight: '500' }}>Closed</span>
+                      ) : qtyInCart > 0 ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#FEF3C7', padding: '0.25rem 0.5rem', borderRadius: '0.5rem' }}>
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(dish.id, qtyInCart - 1)}
+                            style={{ background: '#FFFFFF', border: '1px solid #D1D5DB', borderRadius: '4px', width: '26px', height: '26px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                          >
+                            <Minus size={14} color="#374151" />
+                          </button>
+                          <span style={{ fontWeight: '700', minWidth: '1.25rem', textAlign: 'center', color: '#B45309' }}>
+                            {qtyInCart}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(dish.id, qtyInCart + 1)}
+                            style={{ background: '#F59E0B', border: 'none', borderRadius: '4px', width: '26px', height: '26px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#FFF' }}
+                          >
+                            <Plus size={14} />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => addToCart(dish, restaurant)}
+                          style={{
+                            background: '#F59E0B',
+                            color: '#FFFFFF',
+                            border: 'none',
+                            borderRadius: '0.5rem',
+                            padding: '0.45rem 0.9rem',
+                            fontSize: '0.875rem',
+                            fontWeight: '600',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.35rem',
+                            cursor: 'pointer',
+                            boxShadow: '0 2px 4px rgba(245, 158, 11, 0.25)',
+                          }}
+                        >
+                          <Plus size={15} /> Add
+                        </button>
+                      )}
                     </div>
-                  )}
-                  <span className="category-tag">{dish.category}</span>
-                </div>
-
-                <div className="dish-card__details">
-                  <h3>{dish.name}</h3>
-                  <p>{dish.description || 'Prepared fresh upon order with quality ingredients.'}</p>
-
-                  <div className="price-footer">
-                    <span className="price">${parseFloat(dish.price).toFixed(2)}</span>
-                    <span className="order-soon-pill">Orders in Phase 5</span>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
+
+      {/* Floating Bottom Cart Bar (if current restaurant has items in cart) */}
+      {isCurrentCartRestaurant && totalItems > 0 && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '1.25rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 'calc(100% - 2rem)',
+            maxWidth: '720px',
+            backgroundColor: '#1E293B',
+            color: '#FFFFFF',
+            borderRadius: '1rem',
+            padding: '0.875rem 1.25rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.4)',
+            zIndex: 900,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <div style={{ background: '#F59E0B', borderRadius: '50%', width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <ShoppingCart size={20} color="#FFFFFF" />
+            </div>
+            <div>
+              <div style={{ fontWeight: '600', fontSize: '0.95rem' }}>
+                {totalItems} {totalItems === 1 ? 'item' : 'items'} in your cart
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#94A3B8' }}>
+                Total: <strong style={{ color: '#FCD34D' }}>${totalAmount.toFixed(2)}</strong> (incl. $2.00 delivery)
+              </div>
+            </div>
+          </div>
+          <Link to="/cart">
+            <Button variant="primary" size="small">
+              View Cart & Checkout
+            </Button>
+          </Link>
+        </div>
+      )}
+
+      {/* Cross-Restaurant Conflict Modal */}
+      {conflictModal.isOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '1rem',
+              maxWidth: '460px',
+              width: '100%',
+              padding: '1.75rem',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.25)',
+              textAlign: 'center',
+            }}
+          >
+            <div
+              style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                backgroundColor: '#FEF3C7',
+                color: '#D97706',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem',
+              }}
+            >
+              <AlertTriangle size={26} />
+            </div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem', color: '#111827' }}>
+              Replace items in your cart?
+            </h3>
+            <p style={{ color: '#6B7280', fontSize: '0.925rem', lineHeight: '1.5', marginBottom: '1.5rem' }}>
+              Your cart currently contains dishes from <strong>{cartRestaurant?.name}</strong>. Adding this item from <strong>{conflictModal.newRestaurant?.name}</strong> will discard your existing selection.
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+              <Button variant="secondary" onClick={cancelRestaurantSwitch}>
+                Keep Current Cart
+              </Button>
+              <Button variant="primary" onClick={confirmRestaurantSwitch}>
+                Start New Order
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
