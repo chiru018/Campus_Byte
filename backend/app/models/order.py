@@ -110,3 +110,4 @@ class Order(Base):
 
     def __repr__(self) -> str:
         return f"<Order id={self.id} status={self.order_status} total={self.total_amount}>"
+

@@ -118,3 +118,4 @@ def delete_restaurant_endpoint(
         "deactivated": deactivated,
         "message": message,
     }
+

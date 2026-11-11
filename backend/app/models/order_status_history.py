@@ -44,3 +44,4 @@ class OrderStatusHistory(Base):
 
     def __repr__(self) -> str:
         return f"<OrderStatusHistory id={self.id} order_id={self.order_id} new_status={self.new_status}>"
+

@@ -21,3 +21,4 @@ class OrderItemResponse(OrderItemBase):
     order_id: uuid.UUID
 
     model_config = ConfigDict(from_attributes=True)
+

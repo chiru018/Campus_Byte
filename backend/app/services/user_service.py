@@ -31,3 +31,4 @@ def fetch_users(db: Session, skip: int = 0, limit: int = 100) -> Tuple[List[User
 def modify_user(db: Session, user_id: uuid.UUID, update_data: UserUpdate) -> User:
     user = fetch_user_by_id(db, user_id)
     return crud_user.update_user(db, user, update_data)
+

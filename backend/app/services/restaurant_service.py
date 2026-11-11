@@ -77,3 +77,4 @@ def change_restaurant_availability(
 def remove_restaurant(db: Session, restaurant_id: uuid.UUID) -> Tuple[bool, str]:
     restaurant = get_restaurant_details(db, restaurant_id)
     return crud_restaurant.remove_or_deactivate_restaurant(db, restaurant)
+

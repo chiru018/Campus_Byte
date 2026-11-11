@@ -105,3 +105,4 @@ def remove_or_deactivate_restaurant(
         db.delete(restaurant_obj)
         db.commit()
         return False, "Restaurant was successfully removed."
+

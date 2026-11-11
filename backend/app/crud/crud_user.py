@@ -47,3 +47,4 @@ def update_user(db: Session, user_obj: User, update_data: UserUpdate) -> User:
     db.commit()
     db.refresh(user_obj)
     return user_obj
+

@@ -41,3 +41,4 @@ class BusinessRuleException(CampusByteException):
             detail=detail,
             error_code=error_code,
         )
+

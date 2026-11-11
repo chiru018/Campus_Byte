@@ -55,3 +55,4 @@ class Restaurant(Base):
 
     def __repr__(self) -> str:
         return f"<Restaurant id={self.id} name={self.name} is_open={self.is_open}>"
+

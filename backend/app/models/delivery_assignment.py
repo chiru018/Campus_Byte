@@ -57,3 +57,4 @@ class DeliveryAssignment(Base):
 
     def __repr__(self) -> str:
         return f"<DeliveryAssignment id={self.id} order_id={self.order_id} status={self.delivery_status}>"
+

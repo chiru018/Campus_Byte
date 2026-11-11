@@ -226,3 +226,4 @@ def test_order_item_positive_quantity_constraint(db_session, sample_restaurant, 
     with pytest.raises(IntegrityError):
         db_session.commit()
     db_session.rollback()
+

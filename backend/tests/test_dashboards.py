@@ -15,3 +15,4 @@ def test_dashboard_stats(client, sample_restaurant, sample_customer):
     assert data["restaurants"]["total"] >= 1
     assert data["menu_items"]["total"] >= 1
     assert data["users"]["total"] >= 2
+

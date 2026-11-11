@@ -33,3 +33,4 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         return secrets.compare_digest(derived.hex(), stored_hash)
     except Exception:
         return False
+

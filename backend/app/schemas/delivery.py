@@ -39,3 +39,4 @@ class DeliveryAssignmentResponse(BaseModel):
     delivery_status: DeliveryStatus
 
     model_config = ConfigDict(from_attributes=True)
+

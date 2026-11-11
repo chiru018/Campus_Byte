@@ -52,3 +52,4 @@ class OrderItem(Base):
 
     def __repr__(self) -> str:
         return f"<OrderItem id={self.id} item_name={self.item_name} qty={self.quantity} total={self.total_price}>"
+

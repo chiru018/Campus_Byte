@@ -119,3 +119,4 @@ def delete_menu_item_endpoint(
         "deactivated": deactivated,
         "message": message,
     }
+

@@ -91,3 +91,4 @@ def remove_or_deactivate_menu_item(
         db.delete(item_obj)
         db.commit()
         return False, "Menu item was successfully deleted."
+

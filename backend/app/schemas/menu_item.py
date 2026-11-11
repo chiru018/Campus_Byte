@@ -43,3 +43,4 @@ class MenuItemResponse(MenuItemBase):
 class MenuItemListResponse(BaseModel):
     items: List[MenuItemResponse]
     total: int
+

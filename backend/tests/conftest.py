@@ -118,3 +118,4 @@ def sample_restaurant(db_session, sample_owner) -> Restaurant:
     db_session.commit()
     db_session.refresh(restaurant)
     return restaurant
+

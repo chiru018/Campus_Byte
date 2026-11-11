@@ -63,3 +63,4 @@ def toggle_item_availability(
 def remove_item(db: Session, item_id: uuid.UUID) -> Tuple[bool, str]:
     item = get_item_details(db, item_id)
     return crud_menu.remove_or_deactivate_menu_item(db, item)
+

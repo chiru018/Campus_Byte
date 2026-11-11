@@ -50,3 +50,4 @@ def list_users_endpoint(
 ):
     users, total = fetch_users(db=db, skip=skip, limit=limit)
     return UserListResponse(users=users, total=total)
+

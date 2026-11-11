@@ -175,3 +175,4 @@ Immutable audit log tracking every order state transition.
 | `new_status` | `VARCHAR(30)` | No | - | New state |
 | `changed_by` | `UUID` | Yes | `FOREIGN KEY(users.id)`, `INDEX` | User triggering transition |
 | `created_at` | `TIMESTAMPTZ` | No | `server_default=NOW()` | Audit log timestamp |
+

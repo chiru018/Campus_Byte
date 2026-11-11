@@ -65,3 +65,4 @@ def test_list_users(client, sample_customer, sample_owner):
     assert len(data["users"]) >= 2
     for user in data["users"]:
         assert "password_hash" not in user
+

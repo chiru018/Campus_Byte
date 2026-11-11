@@ -138,3 +138,4 @@ def test_delete_restaurant(client, sample_restaurant):
     # Verify it is deleted
     check_res = client.get(f"/api/restaurants/{sample_restaurant.id}")
     assert check_res.status_code == 404
+

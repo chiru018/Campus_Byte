@@ -31,3 +31,4 @@ __all__ = [
     "DeliveryAssignment",
     "OrderStatusHistory",
 ]
+

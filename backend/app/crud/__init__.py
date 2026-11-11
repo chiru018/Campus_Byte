@@ -45,3 +45,4 @@ __all__ = [
     "set_menu_item_availability",
     "remove_or_deactivate_menu_item",
 ]
+

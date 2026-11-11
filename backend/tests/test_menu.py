@@ -134,3 +134,4 @@ def test_get_update_and_delete_menu_item(client, sample_restaurant):
     # 5. Verify deleted
     verify_res = client.get(f"/api/menu/{item_id}")
     assert verify_res.status_code == 404
+

@@ -58,3 +58,4 @@ def get_dashboard_stats_endpoint(
             "delivery_partners": total_couriers,
         },
     }
+

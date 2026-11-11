@@ -50,3 +50,4 @@ class RestaurantListResponse(BaseModel):
     total: int
     page: int
     size: int
+

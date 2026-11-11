@@ -56,3 +56,4 @@ class DeliveryPartner(Base):
 
     def __repr__(self) -> str:
         return f"<DeliveryPartner id={self.id} user_id={self.user_id} vehicle={self.vehicle_type}>"
+

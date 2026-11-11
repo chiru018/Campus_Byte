@@ -134,3 +134,4 @@ erDiagram
    - `order_items.unit_price > 0`
    - `order_items.total_price > 0`
    - `orders.subtotal >= 0`, `orders.delivery_fee >= 0`, `orders.total_amount >= 0`
+

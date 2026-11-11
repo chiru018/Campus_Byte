@@ -65,3 +65,4 @@ class MenuItem(Base):
 
     def __repr__(self) -> str:
         return f"<MenuItem id={self.id} name={self.name} price={self.price} is_available={self.is_available}>"
+

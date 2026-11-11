@@ -42,3 +42,4 @@ class DeliveryStatus(str, Enum):
     PICKED_UP = "PICKED_UP"
     DELIVERED = "DELIVERED"
     CANCELLED = "CANCELLED"
+
