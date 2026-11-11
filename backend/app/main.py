@@ -18,7 +18,7 @@ from app.api.routers import (
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.API_VERSION,
-    description="Campus Byte - Food Delivery Platform API (Phase 3 Complete Authentication & RBAC)",
+    description="Campus Byte - Food Delivery Platform API (Phase 4 Restaurant & Menu Management)",
     docs_url="/docs",
     redoc_url="/redoc",
 )

@@ -18,6 +18,7 @@ from app.crud.crud_restaurant import (
 from app.crud.crud_menu import (
     get_menu_item_by_id,
     get_menu_items_by_restaurant,
+    get_menu_stats_by_restaurant,
     create_menu_item,
     update_menu_item,
     set_menu_item_availability,
@@ -54,6 +55,7 @@ __all__ = [
     "remove_or_deactivate_restaurant",
     "get_menu_item_by_id",
     "get_menu_items_by_restaurant",
+    "get_menu_stats_by_restaurant",
     "create_menu_item",
     "update_menu_item",
     "set_menu_item_availability",

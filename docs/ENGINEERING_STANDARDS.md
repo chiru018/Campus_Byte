@@ -109,3 +109,4 @@ These engineering standards apply across all phases of the Campus Byte project. 
   - IDOR ownership validation (e.g. Owner A attempting to modify Owner B's restaurant or menu).
   - Regression testing across all completed phases.
 - Ensure the frontend builds cleanly without TypeScript/JSX syntax errors (`npm run build`).
+

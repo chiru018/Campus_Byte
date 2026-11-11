@@ -14,10 +14,12 @@ from app.services.user_service import (
 from app.services.restaurant_service import (
     list_restaurants,
     get_restaurant_details,
+    get_my_restaurant,
     create_new_restaurant,
     update_restaurant_info,
     change_restaurant_availability,
     remove_restaurant,
+    get_restaurant_stats,
 )
 from app.services.menu_service import (
     list_menu_items,
@@ -26,6 +28,7 @@ from app.services.menu_service import (
     update_item,
     toggle_item_availability,
     remove_item,
+    get_categories_list,
 )
 
 __all__ = [
@@ -40,15 +43,18 @@ __all__ = [
     "modify_user",
     "list_restaurants",
     "get_restaurant_details",
+    "get_my_restaurant",
     "create_new_restaurant",
     "update_restaurant_info",
     "change_restaurant_availability",
     "remove_restaurant",
+    "get_restaurant_stats",
     "list_menu_items",
     "get_item_details",
     "add_item_to_menu",
     "update_item",
     "toggle_item_availability",
     "remove_item",
+    "get_categories_list",
 ]
 

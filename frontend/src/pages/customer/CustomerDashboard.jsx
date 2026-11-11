@@ -1,6 +1,7 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Utensils, ShoppingBag, Clock, MapPin, UserCheck } from 'lucide-react';
+import { Utensils, ShoppingBag, Clock, MapPin, UserCheck, ArrowRight } from 'lucide-react';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 
@@ -18,7 +19,7 @@ export default function CustomerDashboard() {
           Welcome back, {user?.full_name || 'Student'}!
         </h1>
         <p style={{ color: '#4B5563', fontSize: '1rem' }}>
-          Browse food outlets, track active deliveries, and manage your campus meal orders.
+          Browse food outlets, explore live menus, and prepare for campus meal orders.
         </p>
       </div>
 
@@ -69,13 +70,13 @@ export default function CustomerDashboard() {
             Ready for your next meal?
           </h2>
           <p style={{ color: '#6B7280', maxWidth: '440px', margin: '0 auto 1.5rem', fontSize: '0.925rem' }}>
-            Browse menus from dining halls, cafes, and campus eateries. Order workflows and checkout will be unlocked in Phase 4.
+            Browse menus from dining halls, cafes, and campus eateries. Order workflows and checkout will be unlocked in Phase 5.
           </p>
-          <a href="/#roles">
+          <Link to="/restaurants" style={{ textDecoration: 'none' }}>
             <Button variant="primary" size="md" icon={Utensils}>
               Explore Campus Outlets
             </Button>
-          </a>
+          </Link>
         </div>
       </Card>
     </div>

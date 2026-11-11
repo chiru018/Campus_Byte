@@ -1,5 +1,6 @@
 from app.models.enums import (
     UserRole,
+    FoodCategory,
     VehicleType,
     OrderStatus,
     PaymentMethod,
@@ -18,6 +19,7 @@ from app.models.revoked_token import RevokedToken
 
 __all__ = [
     "UserRole",
+    "FoodCategory",
     "VehicleType",
     "OrderStatus",
     "PaymentMethod",

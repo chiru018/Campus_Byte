@@ -159,16 +159,16 @@ export default function LandingPage() {
             </p>
 
             <div className="hero__actions">
-              <Link to="/register/customer">
+              <Link to="/restaurants">
                 <Button variant="primary" size="lg" icon={ArrowRight}>
-                  Explore Menus
+                  Browse Restaurants
                 </Button>
               </Link>
-              <a href="#roles">
+              <Link to="/register/customer">
                 <Button variant="secondary" size="lg">
-                  Explore Roles
+                  Get Started
                 </Button>
-              </a>
+              </Link>
             </div>
 
             <div className="hero__stats">

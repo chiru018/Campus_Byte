@@ -86,3 +86,4 @@ export default function RestaurantSidebar({ restaurantName, isOpen }) {
     </aside>
   );
 }
+
