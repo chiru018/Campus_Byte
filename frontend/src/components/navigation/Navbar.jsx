@@ -6,7 +6,6 @@ import {
   X,
   ArrowRight,
   LogOut,
-  User as UserIcon,
   Store,
   Bike,
   LayoutDashboard,
@@ -54,19 +53,24 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <nav className="navbar__links">
+          <Link to="/restaurants" className="navbar__link">
+            Browse Outlets
+          </Link>
+
           {isAuthenticated ? (
             <>
               <Link to={dashboardPath} className="navbar__link">
                 Dashboard
               </Link>
-              {user?.role === 'CUSTOMER' && (
-                <a href="/#roles" className="navbar__link">Browse Outlets</a>
-              )}
               {user?.role === 'RESTAURANT_OWNER' && (
-                <span className="navbar__link" style={{ opacity: 0.8 }}>Kitchen Station</span>
-              )}
-              {user?.role === 'DELIVERY_PARTNER' && (
-                <span className="navbar__link" style={{ opacity: 0.8 }}>Campus Fleet</span>
+                <>
+                  <Link to="/restaurant/menu" className="navbar__link">
+                    Menu Catalog
+                  </Link>
+                  <Link to="/restaurant/profile" className="navbar__link">
+                    Outlet Profile
+                  </Link>
+                </>
               )}
             </>
           ) : (
@@ -125,33 +129,57 @@ export default function Navbar() {
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="navbar__mobile-menu">
+          <Link
+            to="/restaurants"
+            className="navbar__mobile-link"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Browse Outlets
+          </Link>
+
           {isAuthenticated ? (
             <>
               <div style={{ padding: '0.5rem 0', borderBottom: '1px solid #E5E7EB', marginBottom: '0.5rem' }}>
-                <p style={{ fontWeight: 700, color: '#1F2937' }}>{user?.full_name}</p>
-                <p style={{ fontSize: '0.75rem', color: '#6B7280' }}>{user?.email} ({user?.role})</p>
+                <span style={{ fontSize: '0.85rem', color: '#6B7280' }}>
+                  Signed in as <strong>{user?.full_name}</strong> ({user?.role})
+                </span>
               </div>
               <Link
                 to={dashboardPath}
                 className="navbar__mobile-link"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                My Role Dashboard
+                My Dashboard
               </Link>
-              <div className="navbar__mobile-actions">
-                <Button
-                  variant="secondary"
-                  size="md"
-                  className="btn--full"
-                  icon={LogOut}
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    handleLogout();
-                  }}
-                >
-                  Sign Out
-                </Button>
-              </div>
+              {user?.role === 'RESTAURANT_OWNER' && (
+                <>
+                  <Link
+                    to="/restaurant/menu"
+                    className="navbar__mobile-link"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Menu Management
+                  </Link>
+                  <Link
+                    to="/restaurant/profile"
+                    className="navbar__mobile-link"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Restaurant Profile
+                  </Link>
+                </>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleLogout();
+                }}
+                className="navbar__mobile-link"
+                style={{ textAlign: 'left', background: 'none', border: 'none', color: '#EF4444' }}
+              >
+                Sign Out
+              </button>
             </>
           ) : (
             <>
@@ -163,34 +191,33 @@ export default function Navbar() {
                 Who We Serve
               </a>
               <a
-                href="/#tech-stack"
+                href="/#how-it-works"
                 className="navbar__mobile-link"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Platform
+                How It Works
               </a>
-              <div className="navbar__mobile-actions">
-                <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="secondary" size="md" className="btn--full">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link to="/register/customer" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="primary" size="md" className="btn--full">
-                    Register as Customer
-                  </Button>
-                </Link>
-                <Link to="/register/restaurant-owner" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="ghost" size="sm" className="btn--full">
-                    Register as Restaurant Owner
-                  </Button>
-                </Link>
-                <Link to="/register/delivery-partner" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="ghost" size="sm" className="btn--full">
-                    Register as Courier
-                  </Button>
-                </Link>
-              </div>
+              <Link
+                to="/login"
+                className="navbar__mobile-link"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/register/customer"
+                className="navbar__mobile-link"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Register as Student
+              </Link>
+              <Link
+                to="/register/restaurant-owner"
+                className="navbar__mobile-link"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Register as Restaurant
+              </Link>
             </>
           )}
         </div>

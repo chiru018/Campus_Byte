@@ -12,6 +12,7 @@ from app.schemas.restaurant import (
     RestaurantAvailabilityUpdate,
     RestaurantResponse,
     RestaurantListResponse,
+    RestaurantStatsResponse,
 )
 from app.schemas.menu_item import (
     MenuItemBase,
@@ -20,6 +21,7 @@ from app.schemas.menu_item import (
     MenuItemAvailabilityUpdate,
     MenuItemResponse,
     MenuItemListResponse,
+    CategoryResponse,
 )
 from app.schemas.order_item import (
     OrderItemBase,
@@ -67,12 +69,14 @@ __all__ = [
     "RestaurantAvailabilityUpdate",
     "RestaurantResponse",
     "RestaurantListResponse",
+    "RestaurantStatsResponse",
     "MenuItemBase",
     "MenuItemCreate",
     "MenuItemUpdate",
     "MenuItemAvailabilityUpdate",
     "MenuItemResponse",
     "MenuItemListResponse",
+    "CategoryResponse",
     "OrderItemBase",
     "OrderItemCreate",
     "OrderItemResponse",

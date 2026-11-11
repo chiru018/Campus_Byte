@@ -4,20 +4,25 @@ from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+from app.models.user import User
+from app.core.permissions import require_restaurant_owner
 from app.schemas.restaurant import (
     RestaurantCreate,
     RestaurantUpdate,
     RestaurantAvailabilityUpdate,
     RestaurantResponse,
     RestaurantListResponse,
+    RestaurantStatsResponse,
 )
 from app.services.restaurant_service import (
     list_restaurants,
     get_restaurant_details,
+    get_my_restaurant,
     create_new_restaurant,
     update_restaurant_info,
     change_restaurant_availability,
     remove_restaurant,
+    get_restaurant_stats,
 )
 
 router = APIRouter(prefix="/restaurants", tags=["Restaurants"])
@@ -45,6 +50,19 @@ def get_restaurants_endpoint(
 
 
 @router.get(
+    "/my-restaurant",
+    response_model=RestaurantResponse,
+    summary="Get My Restaurant Profile",
+    description="Retrieves the restaurant profile owned by the currently authenticated restaurant owner.",
+)
+def get_my_restaurant_endpoint(
+    current_user: User = Depends(require_restaurant_owner),
+    db: Session = Depends(get_db),
+):
+    return get_my_restaurant(db=db, owner_id=current_user.id)
+
+
+@router.get(
     "/{restaurant_id}",
     response_model=RestaurantResponse,
     summary="Get Restaurant Details",
@@ -57,33 +75,56 @@ def get_restaurant_by_id_endpoint(
     return get_restaurant_details(db=db, restaurant_id=restaurant_id)
 
 
+@router.get(
+    "/{restaurant_id}/stats",
+    response_model=RestaurantStatsResponse,
+    summary="Get Restaurant Statistics",
+    description="Retrieves menu item metrics and profile completion for the authenticated restaurant owner.",
+)
+def get_restaurant_stats_endpoint(
+    restaurant_id: uuid.UUID,
+    current_user: User = Depends(require_restaurant_owner),
+    db: Session = Depends(get_db),
+):
+    return get_restaurant_stats(
+        db=db, restaurant_id=restaurant_id, current_user_id=current_user.id
+    )
+
+
 @router.post(
     "",
     response_model=RestaurantResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Create Restaurant",
-    description="Registers a new restaurant. Note: `owner_id` manual selection is a Phase 2 development-only mechanism and will be replaced by authenticated JWT identity in Phase 3.",
+    description="Registers a new restaurant for the authenticated owner. Automatically links the restaurant to the owner's identity.",
 )
 def create_restaurant_endpoint(
     restaurant_in: RestaurantCreate,
+    current_user: User = Depends(require_restaurant_owner),
     db: Session = Depends(get_db),
 ):
-    return create_new_restaurant(db=db, restaurant_in=restaurant_in)
+    return create_new_restaurant(
+        db=db, restaurant_in=restaurant_in, owner_id=current_user.id
+    )
 
 
 @router.put(
     "/{restaurant_id}",
     response_model=RestaurantResponse,
     summary="Update Restaurant Information",
-    description="Updates metadata, address, contact, and information for an existing restaurant.",
+    description="Updates metadata, address, contact, and information for an existing restaurant. Enforces owner authorization.",
 )
 def update_restaurant_endpoint(
     restaurant_id: uuid.UUID,
     update_in: RestaurantUpdate,
+    current_user: User = Depends(require_restaurant_owner),
     db: Session = Depends(get_db),
 ):
     return update_restaurant_info(
-        db=db, restaurant_id=restaurant_id, update_data=update_in
+        db=db,
+        restaurant_id=restaurant_id,
+        update_data=update_in,
+        current_user_id=current_user.id,
     )
 
 
@@ -91,31 +132,38 @@ def update_restaurant_endpoint(
     "/{restaurant_id}/availability",
     response_model=RestaurantResponse,
     summary="Update Restaurant Availability",
-    description="Toggles or sets the open/closed availability state of the restaurant.",
+    description="Toggles or sets the open/closed availability state of the restaurant. Enforces owner authorization.",
 )
 def update_restaurant_availability_endpoint(
     restaurant_id: uuid.UUID,
     availability_in: RestaurantAvailabilityUpdate,
+    current_user: User = Depends(require_restaurant_owner),
     db: Session = Depends(get_db),
 ):
     return change_restaurant_availability(
-        db=db, restaurant_id=restaurant_id, is_open=availability_in.is_open
+        db=db,
+        restaurant_id=restaurant_id,
+        is_open=availability_in.is_open,
+        current_user_id=current_user.id,
     )
 
 
 @router.delete(
     "/{restaurant_id}",
+    status_code=status.HTTP_200_OK,
     summary="Delete or Deactivate Restaurant",
-    description="Safely removes a restaurant if it has no orders. If historical orders exist, automatically deactivates (is_open=False) to preserve referential integrity.",
+    description="Safely removes or deactivates a restaurant. If historical orders exist, preserves data integrity by deactivating (is_open=False).",
 )
 def delete_restaurant_endpoint(
     restaurant_id: uuid.UUID,
+    current_user: User = Depends(require_restaurant_owner),
     db: Session = Depends(get_db),
 ):
-    deactivated, message = remove_restaurant(db=db, restaurant_id=restaurant_id)
+    was_deactivated, message = remove_restaurant(
+        db=db, restaurant_id=restaurant_id, current_user_id=current_user.id
+    )
     return {
         "restaurant_id": restaurant_id,
-        "deactivated": deactivated,
+        "is_deactivated": was_deactivated,
         "message": message,
     }
-

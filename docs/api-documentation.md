@@ -9,6 +9,7 @@
 
 ### 1.1 Register Customer
 - **Endpoint:** `POST /api/auth/register/customer`
+- **Access:** Public
 - **Status:** `201 Created`
 - **Request Body:**
   ```json
@@ -24,6 +25,7 @@
 
 ### 1.2 Register Restaurant Owner
 - **Endpoint:** `POST /api/auth/register/restaurant-owner`
+- **Access:** Public
 - **Status:** `201 Created`
 - **Request Body:**
   ```json
@@ -41,6 +43,7 @@
 
 ### 1.3 Register Delivery Partner
 - **Endpoint:** `POST /api/auth/register/delivery-partner`
+- **Access:** Public
 - **Status:** `201 Created`
 - **Request Body:**
   ```json
@@ -56,6 +59,7 @@
 
 ### 1.4 User Login
 - **Endpoint:** `POST /api/auth/login`
+- **Access:** Public
 - **Status:** `200 OK`
 - **Request Body:**
   ```json
@@ -82,49 +86,142 @@
 
 ### 1.6 Logout
 - **Endpoint:** `POST /api/auth/logout`
+- **Access:** Authenticated
 - **Status:** `200 OK`
-- **Side Effect:** Denylists JWT `jti` in PostgreSQL and deletes session cookie.
+- **Side Effect:** Denylists JWT `jti` in PostgreSQL `revoked_tokens` table and deletes session cookie.
 
 ---
 
-## 2. RBAC Protected Endpoints (`/api/protected`)
+## 2. Restaurant Management Endpoints (`/api/restaurants`)
 
-- `GET /api/protected/customer-only` – Restricted to `CUSTOMER` (403 for others).
-- `GET /api/protected/restaurant-owner-only` – Restricted to `RESTAURANT_OWNER` (403 for others).
-- `GET /api/protected/delivery-partner-only` – Restricted to `DELIVERY_PARTNER` (403 for others).
+### 2.1 List Restaurants
+- **Endpoint:** `GET /api/restaurants`
+- **Access:** Public / Customer
+- **Query Parameters:**
+  - `page` (int, default: 1)
+  - `size` (int, default: 20)
+  - `search` (string, optional)
+  - `is_open` (boolean, optional)
+- **Status:** `200 OK`
+- **Response:** `RestaurantListResponse` containing `restaurants`, `total`, `page`, `size`.
+
+### 2.2 Get My Restaurant Profile
+- **Endpoint:** `GET /api/restaurants/my-restaurant`
+- **Access:** `RESTAURANT_OWNER`
+- **Status:** `200 OK` / `404 Not Found`
+- **Response:** `RestaurantResponse`
+
+### 2.3 Get Restaurant Details
+- **Endpoint:** `GET /api/restaurants/{restaurant_id}`
+- **Access:** Public
+- **Status:** `200 OK` / `404 Not Found`
+- **Response:** `RestaurantResponse`
+
+### 2.4 Get Restaurant Statistics
+- **Endpoint:** `GET /api/restaurants/{restaurant_id}/stats`
+- **Access:** `RESTAURANT_OWNER` (Enforces ownership IDOR check)
+- **Status:** `200 OK` / `403 Forbidden` / `404 Not Found`
+- **Response:**
+  ```json
+  {
+    "restaurant_id": "...",
+    "restaurant_name": "Campus Grill & Cafe",
+    "is_open": true,
+    "total_menu_items": 12,
+    "available_menu_items": 10,
+    "unavailable_menu_items": 2,
+    "profile_completion_percentage": 100
+  }
+  ```
+
+### 2.5 Create Restaurant
+- **Endpoint:** `POST /api/restaurants`
+- **Access:** `RESTAURANT_OWNER` (Links automatically to `current_user.id`)
+- **Status:** `201 Created` / `409 Conflict` (if owner already has a restaurant)
+- **Request Body:**
+  ```json
+  {
+    "name": "Pizza Corner",
+    "description": "Authentic woodfired pizzas",
+    "address": "Campus Center, Booth 4",
+    "contact_number": "+1234567800",
+    "image_url": "https://example.com/pizza.jpg",
+    "is_open": true
+  }
+  ```
+
+### 2.6 Update Restaurant
+- **Endpoint:** `PUT /api/restaurants/{restaurant_id}`
+- **Access:** `RESTAURANT_OWNER` (Owner-verified; 403 for other owners)
+- **Status:** `200 OK` / `403 Forbidden` / `404 Not Found`
+
+### 2.7 Update Restaurant Availability
+- **Endpoint:** `PATCH /api/restaurants/{restaurant_id}/availability`
+- **Access:** `RESTAURANT_OWNER` (Owner-verified; 403 for other owners)
+- **Request Body:** `{"is_open": false}`
+- **Status:** `200 OK` / `403 Forbidden`
+
+### 2.8 Delete or Deactivate Restaurant
+- **Endpoint:** `DELETE /api/restaurants/{restaurant_id}`
+- **Access:** `RESTAURANT_OWNER` (Owner-verified; 403 for other owners)
+- **Status:** `200 OK` (Deactivates if historical orders exist, otherwise deletes)
 
 ---
 
-## 3. Restaurant Endpoints (`/api/restaurants`)
+## 3. Menu Management Endpoints (`/api/menu` & `/api/restaurants/.../menu`)
 
-- `GET /api/restaurants` – List restaurants (`?page=1&size=20&search=...&is_open=...`).
-- `GET /api/restaurants/{restaurant_id}` – Details by UUID.
-- `POST /api/restaurants` – Create restaurant.
-- `PUT /api/restaurants/{restaurant_id}` – Update restaurant.
-- `PATCH /api/restaurants/{restaurant_id}/availability` – Toggle open/closed status.
-- `DELETE /api/restaurants/{restaurant_id}` – Safe delete or deactivation.
+### 3.1 List Food Categories
+- **Endpoint:** `GET /api/menu/categories`
+- **Access:** Public
+- **Status:** `200 OK`
+- **Response:** Array of category items: `[{"key": "BIRYANI", "label": "Biryani"}, ...]`
 
----
+### 3.2 List Restaurant Menu Items
+- **Endpoint:** `GET /api/restaurants/{restaurant_id}/menu`
+- **Access:** Public
+- **Query Parameters:**
+  - `category` (string, optional: e.g. `BIRYANI`, `BURGERS`, `BEVERAGES`)
+  - `is_available` (boolean, optional)
+  - `search` (string, optional)
+- **Status:** `200 OK`
+- **Response:** `MenuItemListResponse` containing `items` and `total`.
 
-## 4. Menu Endpoints (`/api/menu` & `/api/restaurants/{restaurant_id}/menu`)
+### 3.3 Add Menu Item
+- **Endpoint:** `POST /api/restaurants/{restaurant_id}/menu`
+- **Access:** `RESTAURANT_OWNER` (Owner-verified; 403 for other owners)
+- **Status:** `201 Created` / `422 Unprocessable Entity`
+- **Request Body:**
+  ```json
+  {
+    "name": "Classic Cheeseburger",
+    "description": "Beef patty, cheddar cheese, brioche bun",
+    "price": "8.50",
+    "category": "BURGERS",
+    "image_url": "https://example.com/burger.jpg",
+    "is_available": true
+  }
+  ```
 
-- `GET /api/restaurants/{restaurant_id}/menu` – List items (`?category=...&is_available=...`).
-- `POST /api/restaurants/{restaurant_id}/menu` – Add item (price must be `> 0`).
-- `GET /api/menu/{item_id}` – Get item details.
-- `PUT /api/menu/{item_id}` – Update dish details.
-- `PATCH /api/menu/{item_id}/availability` – Toggle stock flag.
-- `DELETE /api/menu/{item_id}` – Safe delete or deactivation.
+### 3.4 Get Menu Item Details
+- **Endpoint:** `GET /api/menu/{item_id}`
+- **Access:** Public
+- **Status:** `200 OK` / `404 Not Found`
 
----
+### 3.5 Update Menu Item
+- **Endpoint:** `PUT /api/menu/{item_id}`
+- **Access:** `RESTAURANT_OWNER` (Owner-verified; 403 for other owners)
+- **Status:** `200 OK` / `403 Forbidden` / `422 Unprocessable Entity`
 
-## 5. Standard Error Format
+### 3.6 Change Item Availability
+- **Endpoint:** `PATCH /api/menu/{item_id}/availability`
+- **Access:** `RESTAURANT_OWNER` (Owner-verified; 403 for other owners)
+- **Request Body:** `{"is_available": false}`
+- **Status:** `200 OK` / `403 Forbidden`
 
-All domain exceptions return uniform JSON structures:
-```json
-{
-  "detail": "Description of the error condition.",
-  "error_code": "RESOURCE_NOT_FOUND | DUPLICATE_RESOURCE | INVALID_CREDENTIALS | FORBIDDEN",
-  "extra": null
-}
-```
-
+### 3.7 Delete or Deactivate Menu Item
+- **Endpoint:** `DELETE /api/menu/{item_id}`
+- **Access:** `RESTAURANT_OWNER` (Owner-verified; 403 for other owners)
+- **Behavior:**
+  - If item appears in historical orders (`order_items`), sets `is_available = False` to protect historical audit trails.
+  - If no historical orders reference it, deletes record from database.
+- **Status:** `200 OK` / `403 Forbidden`

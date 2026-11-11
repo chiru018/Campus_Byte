@@ -1,7 +1,15 @@
 import uuid
 from datetime import datetime
 from typing import Optional, List
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+
+def validate_optional_url(v: Optional[str]) -> Optional[str]:
+    if v is not None and v.strip():
+        v = v.strip()
+        if not (v.startswith("http://") or v.startswith("https://") or v.startswith("/")):
+            raise ValueError("Image URL must start with http://, https://, or /")
+    return v
 
 
 class RestaurantBase(BaseModel):
@@ -11,13 +19,18 @@ class RestaurantBase(BaseModel):
     contact_number: str = Field(..., min_length=5, max_length=20, description="Contact phone number")
     image_url: Optional[str] = Field(None, max_length=500, description="Hero image or logo URL")
 
+    @field_validator("image_url")
+    @classmethod
+    def check_image_url(cls, v: Optional[str]) -> Optional[str]:
+        return validate_optional_url(v)
+
 
 class RestaurantCreate(RestaurantBase):
-    # Isolated temporary owner selection mechanism for Phase 2 development.
-    # In Phase 3, owner_id will be automatically populated from authenticated JWT session.
-    owner_id: uuid.UUID = Field(
-        ...,
-        description="Owner user UUID (Temporary Phase 2 manual selection; replaced by JWT auth in Phase 3)"
+    # Optional owner_id for backwards compatibility; in Phase 4 authenticated endpoints,
+    # the owner_id is automatically assigned from the authenticated user token.
+    owner_id: Optional[uuid.UUID] = Field(
+        default=None,
+        description="Owner user UUID (assigned server-side from JWT authentication)",
     )
     is_open: bool = Field(default=True, description="Initial availability status")
 
@@ -29,6 +42,11 @@ class RestaurantUpdate(BaseModel):
     contact_number: Optional[str] = Field(None, min_length=5, max_length=20)
     image_url: Optional[str] = Field(None, max_length=500)
     is_open: Optional[bool] = None
+
+    @field_validator("image_url")
+    @classmethod
+    def check_image_url(cls, v: Optional[str]) -> Optional[str]:
+        return validate_optional_url(v)
 
 
 class RestaurantAvailabilityUpdate(BaseModel):
@@ -51,3 +69,12 @@ class RestaurantListResponse(BaseModel):
     page: int
     size: int
 
+
+class RestaurantStatsResponse(BaseModel):
+    restaurant_id: uuid.UUID
+    restaurant_name: str
+    is_open: bool
+    total_menu_items: int
+    available_menu_items: int
+    unavailable_menu_items: int
+    profile_completion_percentage: int

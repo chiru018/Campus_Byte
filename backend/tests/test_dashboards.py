@@ -1,9 +1,10 @@
-def test_dashboard_stats(client, sample_restaurant, sample_customer):
+def test_dashboard_stats(client, sample_restaurant, sample_customer, owner_headers):
     """Test platform dashboard statistics summary."""
-    # Add a menu item to the restaurant
+    # Add a menu item to the restaurant as authenticated owner
     client.post(
         f"/api/restaurants/{sample_restaurant.id}/menu",
-        json={"name": "Club Sandwich", "price": "6.50", "category": "Mains"},
+        json={"name": "Club Sandwich", "price": "6.50", "category": "FAST_FOOD"},
+        headers=owner_headers,
     )
 
     response = client.get("/api/dashboards/stats")

@@ -1,6 +1,6 @@
 import uuid
-from typing import List, Optional, Tuple
-from sqlalchemy import select, func
+from typing import List, Optional, Tuple, Dict, Any
+from sqlalchemy import select, func, or_
 from sqlalchemy.orm import Session
 
 from app.models.menu_item import MenuItem
@@ -17,6 +17,7 @@ def get_menu_items_by_restaurant(
     restaurant_id: uuid.UUID,
     category: Optional[str] = None,
     is_available: Optional[bool] = None,
+    search: Optional[str] = None,
 ) -> Tuple[List[MenuItem], int]:
     query = select(MenuItem).where(MenuItem.restaurant_id == restaurant_id)
 
@@ -26,11 +27,41 @@ def get_menu_items_by_restaurant(
     if is_available is not None:
         query = query.where(MenuItem.is_available == is_available)
 
+    if search:
+        search_filter = f"%{search.strip()}%"
+        query = query.where(
+            or_(
+                MenuItem.name.ilike(search_filter),
+                MenuItem.description.ilike(search_filter),
+            )
+        )
+
     count_query = select(func.count()).select_from(query.subquery())
     total = db.scalar(count_query) or 0
 
     items = list(db.scalars(query.order_by(MenuItem.category, MenuItem.name)).all())
     return items, total
+
+
+def get_menu_stats_by_restaurant(db: Session, restaurant_id: uuid.UUID) -> Dict[str, int]:
+    """Calculates counts of total, available, and unavailable menu items."""
+    total = db.scalar(
+        select(func.count(MenuItem.id)).where(MenuItem.restaurant_id == restaurant_id)
+    ) or 0
+
+    available = db.scalar(
+        select(func.count(MenuItem.id)).where(
+            MenuItem.restaurant_id == restaurant_id,
+            MenuItem.is_available == True,
+        )
+    ) or 0
+
+    unavailable = total - available
+    return {
+        "total": total,
+        "available": available,
+        "unavailable": unavailable,
+    }
 
 
 def create_menu_item(
@@ -91,4 +122,3 @@ def remove_or_deactivate_menu_item(
         db.delete(item_obj)
         db.commit()
         return False, "Menu item was successfully deleted."
-

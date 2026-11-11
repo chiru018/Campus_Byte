@@ -19,4 +19,10 @@ This document audits the security controls implemented in **Campus Byte** agains
 | **CORS Configuration** | Restricted to explicit development and production origins (`http://localhost:5173`, `http://127.0.0.1:5173`). Wildcard `*` rejected. | Configured in `app.core.config.Settings.BACKEND_CORS_ORIGINS`. | ✅ PASS |
 | **Transaction Safety** | Multi-table registration (Owner + Restaurant, Courier + DeliveryPartner) wrapped in database transactions with rollback on failure. | Verified via `test_register_restaurant_owner_success`. | ✅ PASS |
 | **Secret Management** | All credentials (`JWT_SECRET_KEY`, `DATABASE_URL`) loaded from environment variables. `.env` strictly ignored by Git. | Verified in `.gitignore`. | ✅ PASS |
-
+| **Restaurant Ownership (IDOR)** | Owner A cannot modify, update availability, or delete Owner B's restaurant. Enforced in FastAPI service layer with 403 Forbidden. | Verified via `test_reject_update_by_different_owner_idor`. | ✅ PASS |
+| **Menu Item Ownership (IDOR)** | Owner A cannot create, update, toggle availability, or delete dishes on Owner B's restaurant. | Verified via `test_reject_add_menu_item_by_other_owner_idor` and `test_get_update_and_delete_menu_item`. | ✅ PASS |
+| **Role Privilege Enforcement** | Customers and delivery partners cannot create or modify restaurants or food items. | Verified via `test_reject_restaurant_creation_by_customer` and `test_reject_add_menu_item_by_customer`. | ✅ PASS |
+| **Price Integrity** | Menu item creation and update enforce strictly positive prices (`price > 0`). Zero and negative prices rejected. | Verified via `test_reject_menu_item_invalid_price` (HTTP 422). | ✅ PASS |
+| **Category Whitelisting** | Standardized 10 food categories with input normalization and rejection of invalid values. | Verified via `test_reject_menu_item_invalid_category` (HTTP 422). | ✅ PASS |
+| **Historical Data Integrity** | Deleting a menu item referenced in historical orders sets `is_available = False` rather than breaking references or foreign keys. | Verified via `test_delete_menu_item_with_historical_orders_deactivates`. | ✅ PASS |
+| **Image URL Sanitation** | Validates that image URLs begin with safe protocols (`http://`, `https://`, or `/`). | Verified via Pydantic validator on `RestaurantBase` and `MenuItemBase`. | ✅ PASS |

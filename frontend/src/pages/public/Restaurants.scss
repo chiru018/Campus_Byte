@@ -1,0 +1,391 @@
+@use '../../styles/variables' as *;
+
+.restaurants-page {
+  padding: $space-8 0 $space-16 0;
+  min-height: calc(100vh - 72px);
+  background-color: $background;
+
+  &__header {
+    margin-bottom: $space-8;
+    text-align: center;
+
+    h1 {
+      font-size: $font-size-3xl;
+      font-weight: 800;
+      color: $text-main;
+      margin: 0 0 $space-2 0;
+    }
+
+    p {
+      color: $text-secondary;
+      font-size: $font-size-base;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  }
+
+  &__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-4;
+    margin-bottom: $space-8;
+    background-color: $surface;
+    padding: $space-4;
+    border-radius: $radius-xl;
+    border: 1px solid $border-color;
+    box-shadow: $shadow-sm;
+
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+      position: relative;
+
+      svg {
+        position: absolute;
+        left: $space-4;
+        top: 50%;
+        transform: translateY(-50%);
+        color: $text-muted;
+      }
+
+      input {
+        width: 100%;
+        padding: $space-3 $space-4 $space-3 2.75rem;
+        border: 1px solid $border-color;
+        border-radius: $radius-lg;
+        font-size: $font-size-sm;
+        outline: none;
+        background-color: $surface;
+
+        &:focus {
+          border-color: $border-color-focus;
+        }
+      }
+    }
+
+    .filter-select {
+      padding: $space-3 $space-4;
+      border: 1px solid $border-color;
+      border-radius: $radius-lg;
+      font-size: $font-size-sm;
+      color: $text-secondary;
+      background-color: $surface;
+      outline: none;
+
+      &:focus {
+        border-color: $border-color-focus;
+      }
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: $space-6;
+  }
+}
+
+// Public Restaurant Card
+.restaurant-card {
+  background-color: $surface;
+  border: 1px solid $border-color;
+  border-radius: $radius-xl;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: $shadow-sm;
+  transition: transform $transition-fast, box-shadow $transition-fast;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: $shadow-md;
+  }
+
+  &__banner {
+    height: 180px;
+    background-color: $surface-alt;
+    position: relative;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .placeholder-banner {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $text-muted;
+    }
+
+    .status-badge {
+      position: absolute;
+      top: $space-3;
+      right: $space-3;
+      padding: 4px 10px;
+      border-radius: $radius-full;
+      font-size: $font-size-xs;
+      font-weight: 700;
+      backdrop-filter: blur(4px);
+
+      &.open {
+        background-color: rgba($success, 0.95);
+        color: $text-inverse;
+      }
+
+      &.closed {
+        background-color: rgba($danger, 0.95);
+        color: $text-inverse;
+      }
+    }
+  }
+
+  &__content {
+    padding: $space-6;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    h3 {
+      font-size: $font-size-lg;
+      font-weight: 700;
+      color: $text-main;
+      margin: 0 0 $space-2 0;
+    }
+
+    p {
+      font-size: $font-size-sm;
+      color: $text-secondary;
+      line-height: 1.5;
+      margin: 0 0 $space-4 0;
+      flex: 1;
+    }
+
+    .restaurant-meta {
+      display: flex;
+      flex-direction: column;
+      gap: $space-1;
+      padding-top: $space-3;
+      border-top: 1px solid $border-color;
+      margin-bottom: $space-5;
+
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: $space-2;
+        font-size: $font-size-xs;
+        color: $text-muted;
+
+        svg {
+          color: $primary;
+          flex-shrink: 0;
+        }
+      }
+    }
+  }
+}
+
+// Restaurant Detail Page
+.restaurant-detail-page {
+  padding-bottom: $space-16;
+  background-color: $background;
+
+  .hero-banner {
+    background-color: $secondary;
+    color: $text-inverse;
+    padding: $space-10 0;
+    margin-bottom: $space-8;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba($secondary, 0.95) 0%, rgba($secondary, 0.8) 100%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: $space-2;
+        color: rgba($text-inverse, 0.8);
+        font-size: $font-size-sm;
+        text-decoration: none;
+        margin-bottom: $space-4;
+
+        &:hover {
+          color: $text-inverse;
+        }
+      }
+
+      h1 {
+        font-size: $font-size-3xl;
+        font-weight: 800;
+        margin: 0 0 $space-2 0;
+      }
+
+      .description {
+        font-size: $font-size-base;
+        color: rgba($text-inverse, 0.9);
+        max-width: 700px;
+        margin-bottom: $space-4;
+      }
+
+      .meta-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: $space-4;
+        align-items: center;
+
+        .badge-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: $space-2;
+          background-color: rgba($surface, 0.15);
+          padding: 4px 12px;
+          border-radius: $radius-full;
+          font-size: $font-size-xs;
+          backdrop-filter: blur(4px);
+        }
+      }
+    }
+  }
+
+  // Category Pills
+  .category-tabs {
+    display: flex;
+    gap: $space-2;
+    overflow-x: auto;
+    padding-bottom: $space-4;
+    margin-bottom: $space-6;
+    border-bottom: 1px solid $border-color;
+
+    button {
+      padding: $space-2 $space-4;
+      border-radius: $radius-full;
+      font-size: $font-size-xs;
+      font-weight: 600;
+      border: 1px solid $border-color;
+      background-color: $surface;
+      color: $text-secondary;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all $transition-fast;
+
+      &:hover {
+        border-color: $primary;
+        color: $primary;
+      }
+
+      &.active {
+        background-color: $primary;
+        border-color: $primary;
+        color: $text-inverse;
+      }
+    }
+  }
+
+  // Public Menu Grid
+  .public-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: $space-6;
+
+    .dish-card {
+      background-color: $surface;
+      border: 1px solid $border-color;
+      border-radius: $radius-xl;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: $shadow-sm;
+
+      &__image {
+        height: 180px;
+        background-color: $surface-alt;
+        position: relative;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .dish-placeholder {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: $text-muted;
+        }
+
+        .category-tag {
+          position: absolute;
+          top: $space-3;
+          left: $space-3;
+          background-color: rgba($secondary, 0.85);
+          color: $text-inverse;
+          padding: 2px 8px;
+          border-radius: $radius-full;
+          font-size: $font-size-xs;
+          font-weight: 600;
+        }
+      }
+
+      &__details {
+        padding: $space-5;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+
+        h3 {
+          font-size: $font-size-base;
+          font-weight: 700;
+          color: $text-main;
+          margin: 0 0 $space-1 0;
+        }
+
+        p {
+          font-size: $font-size-xs;
+          color: $text-secondary;
+          line-height: 1.4;
+          margin: 0 0 $space-4 0;
+          flex: 1;
+        }
+
+        .price-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-top: $space-3;
+          border-top: 1px solid $border-color;
+
+          .price {
+            font-size: $font-size-lg;
+            font-weight: 800;
+            color: $primary;
+          }
+
+          .order-soon-pill {
+            font-size: $font-size-xs;
+            color: $text-muted;
+            background-color: $surface-alt;
+            padding: 3px 8px;
+            border-radius: $radius-full;
+          }
+        }
+      }
+    }
+  }
+}

@@ -7,6 +7,19 @@ class UserRole(str, Enum):
     DELIVERY_PARTNER = "DELIVERY_PARTNER"
 
 
+class FoodCategory(str, Enum):
+    BIRYANI = "BIRYANI"
+    PIZZA = "PIZZA"
+    BURGERS = "BURGERS"
+    SOUTH_INDIAN = "SOUTH_INDIAN"
+    NORTH_INDIAN = "NORTH_INDIAN"
+    CHINESE = "CHINESE"
+    FAST_FOOD = "FAST_FOOD"
+    DESSERTS = "DESSERTS"
+    BEVERAGES = "BEVERAGES"
+    OTHER = "OTHER"
+
+
 class VehicleType(str, Enum):
     BICYCLE = "BICYCLE"
     SCOOTER = "SCOOTER"

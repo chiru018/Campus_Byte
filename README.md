@@ -15,8 +15,8 @@ Campus Byte is a modern, enterprise-grade, full-stack campus food ordering and d
 | **Phase 1** | Project Foundation & Workspace Environment | **Completed** | Full React 18 (Vite) + FastAPI scaffolding, Docker Compose, SCSS tokens |
 | **Phase 2** | Database Architecture & Backend Foundation | **Completed** | PostgreSQL 17 + SQLAlchemy 2.0 + Alembic, 9 relational entities, 26 tests passing |
 | **Phase 3** | Authentication, JWT Security, & RBAC | **Completed** | Argon2id hashing, dual-transport JWT, token denylist, role guards, 46 tests passing |
-| **Phase 4** | Restaurant Ordering & Kitchen Workflows | *Scheduled* | Cart management, order placement, and kitchen status management |
-| **Phase 5** | Courier Dispatch & Campus Delivery Logistics | *Scheduled* | Delivery matching, GPS tracking, and delivery confirmation |
+| **Phase 4** | Complete Restaurant & Menu Management | **Completed** | Owner dashboard, menu catalog, public discovery, IDOR protection, 54 tests passing |
+| **Phase 5** | Customer Ordering, Cart & Campus Delivery Logistics | *Scheduled* | Cart management, order placement, courier dispatch, and live tracking |
 
 ---
 
@@ -254,6 +254,7 @@ graph TD
 
 The `docs/` folder contains comprehensive engineering specifications:
 
+- [Engineering Standards](docs/ENGINEERING_STANDARDS.md): Mandatory architectural, security, testing, and database guidelines.
 - [System Architecture Document](docs/architecture.md): Service boundaries, data flow diagrams, and architectural patterns.
 - [API Documentation](docs/api-documentation.md): Detailed OpenAPI endpoint catalog, payload contracts, and error responses.
 - [Security Checklist](docs/security-checklist.md): Comprehensive OWASP Top 10 compliance audit.
@@ -322,12 +323,12 @@ Frontend will be accessible at:
 
 ## 8. Automated Testing & Verification
 
-Run the comprehensive automated backend test suite (46 tests):
+Run the comprehensive automated backend test suite (54 tests):
 ```powershell
 .\.venv\Scripts\pytest.exe backend/tests -v
 ```
 
-All 46 test cases cover:
+All 54 test cases cover:
 - Customer, Restaurant Owner, and Delivery Partner registration.
 - Duplicate email prevention and invalid email formatting rejection.
 - Password policy verification (mismatch, weak length, missing requirements).
@@ -336,13 +337,18 @@ All 46 test cases cover:
 - JWT decoding, expiration enforcement, invalid signature rejection, and malformed header detection.
 - Logout and server-side token revocation checking against PostgreSQL `revoked_tokens`.
 - Cross-role authorization tests (403 Forbidden verification).
+- Restaurant creation by authenticated owner, rejection by customers, and prevention of duplicate restaurants per owner.
+- IDOR ownership security tests (rejecting modification of another owner's restaurant or menu items).
+- Menu item management (creation, update, availability toggling, price > 0 validation).
+- Standard food category validation and filtering.
+- Safe historical record deactivation preserving referential integrity for orders.
 - Schema integrity, positive price constraints, and database relationships.
 
 To verify frontend compilation:
 ```powershell
 npm --prefix frontend run build
 ```
-Builds 1670+ modules cleanly to `frontend/dist/` with zero errors.
+Builds 1680+ modules cleanly to `frontend/dist/` with zero errors.
 
 ---
 

@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), ".."
 from app.db.base import Base
 from app.db.session import get_db
 from app.models import User, Restaurant, MenuItem, UserRole
-from app.core.security import get_password_hash
+from app.core.security import get_password_hash, create_access_token
 from app.main import app
 
 # Isolated in-memory SQLite engine for automated unit tests
@@ -118,4 +118,44 @@ def sample_restaurant(db_session, sample_owner) -> Restaurant:
     db_session.commit()
     db_session.refresh(restaurant)
     return restaurant
+
+
+@pytest.fixture
+def owner_headers(sample_owner) -> dict:
+    """Authorization header fixture for sample_owner."""
+    token, _, _ = create_access_token(sample_owner.id, sample_owner.role.value)
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+def customer_headers(sample_customer) -> dict:
+    """Authorization header fixture for sample_customer."""
+    token, _, _ = create_access_token(sample_customer.id, sample_customer.role.value)
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+def other_owner(db_session) -> User:
+    """Secondary Restaurant Owner for IDOR security tests."""
+    owner = User(
+        id=uuid.uuid4(),
+        full_name="Chef Luigi",
+        email="chef.luigi@campusbyte.com",
+        phone_number="+1999888777",
+        password_hash=get_password_hash("LuigiSecret123!"),
+        role=UserRole.RESTAURANT_OWNER,
+        is_active=True,
+    )
+    db_session.add(owner)
+    db_session.commit()
+    db_session.refresh(owner)
+    return owner
+
+
+@pytest.fixture
+def other_owner_headers(other_owner) -> dict:
+    """Authorization header fixture for secondary owner."""
+    token, _, _ = create_access_token(other_owner.id, other_owner.role.value)
+    return {"Authorization": f"Bearer {token}"}
+
 

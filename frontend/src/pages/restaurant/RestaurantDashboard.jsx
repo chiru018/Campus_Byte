@@ -1,83 +1,273 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  Store,
+  UtensilsCrossed,
+  CheckCircle,
+  XCircle,
+  PlusCircle,
+  ArrowRight,
+  Info,
+  Clock,
+  Sparkles,
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { Store, UtensilsCrossed, CheckCircle2, TrendingUp, Settings } from 'lucide-react';
-import Card from '../../components/common/Card';
+import restaurantService from '../../services/restaurantService';
+import RestaurantSidebar from '../../components/navigation/RestaurantSidebar';
 import Button from '../../components/common/Button';
+import './Restaurant.scss';
 
 export default function RestaurantDashboard() {
   const { user } = useAuth();
-  const restaurant = user?.restaurant;
+  const [restaurant, setRestaurant] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [togglingStatus, setTogglingStatus] = useState(false);
+
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const myRest = await restaurantService.getMyRestaurant();
+      setRestaurant(myRest);
+      if (myRest?.id) {
+        const statsData = await restaurantService.getRestaurantStats(myRest.id);
+        setStats(statsData);
+      }
+    } catch (err) {
+      if (err.response?.status === 404) {
+        setRestaurant(null);
+      } else {
+        setError(err.response?.data?.detail || 'Failed to load restaurant dashboard.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const handleToggleAvailability = async () => {
+    if (!restaurant) return;
+    setTogglingStatus(true);
+    try {
+      const newStatus = !restaurant.is_open;
+      const updated = await restaurantService.updateRestaurantAvailability(
+        restaurant.id,
+        newStatus
+      );
+      setRestaurant(updated);
+      if (stats) {
+        setStats({ ...stats, is_open: newStatus });
+      }
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Could not update availability.');
+    } finally {
+      setTogglingStatus(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="restaurant-layout">
+        <div style={{ padding: '3rem', textAlign: 'center', width: '100%' }}>
+          <p>Loading restaurant dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If owner hasn't created a restaurant yet
+  if (!restaurant) {
+    return (
+      <div className="restaurant-layout">
+        <div className="restaurant-content" style={{ margin: '0 auto' }}>
+          <div className="empty-state">
+            <Store size={48} />
+            <h3>No Restaurant Registered</h3>
+            <p>
+              Welcome, {user?.full_name}! To start serving campus diners, please set up your restaurant profile.
+            </p>
+            <Link to="/restaurant/profile">
+              <Button variant="primary" icon={PlusCircle}>
+                Register Your Restaurant
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container" style={{ padding: '3rem 1rem' }}>
-      <div style={{ marginBottom: '2.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-          <span className="badge badge--secondary">Restaurant Owner Portal</span>
-          <span className="badge badge--success">Kitchen Active</span>
+    <div className="restaurant-layout">
+      <RestaurantSidebar
+        restaurantName={restaurant.name}
+        isOpen={restaurant.is_open}
+      />
+
+      <main className="restaurant-content">
+        <div className="restaurant-content__header">
+          <div>
+            <h1>{restaurant.name}</h1>
+            <p>{restaurant.address} • Contact: {restaurant.contact_number}</p>
+          </div>
+
+          <div className="header-actions">
+            <label className="toggle-switch">
+              <input
+                type="checkbox"
+                checked={restaurant.is_open}
+                onChange={handleToggleAvailability}
+                disabled={togglingStatus}
+              />
+              <span className="switch-slider"></span>
+              <span className="toggle-label">
+                {restaurant.is_open ? 'Accepting Orders' : 'Outlet Closed'}
+              </span>
+            </label>
+            <Link to="/restaurant/menu/add">
+              <Button variant="primary" size="sm" icon={PlusCircle}>
+                Add Food Item
+              </Button>
+            </Link>
+          </div>
         </div>
-        <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#1F2937' }}>
-          {restaurant?.name || 'Restaurant Management Hub'}
-        </h1>
-        <p style={{ color: '#4B5563', fontSize: '1rem' }}>
-          Manager: {user?.full_name} ({user?.email})
-        </p>
-      </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
-        <Card>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ width: '44px', height: '44px', borderRadius: '10px', background: '#FFEDD5', color: '#F97316', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Store size={22} />
-            </div>
-            <div>
-              <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#6B7280', fontWeight: 700 }}>Outlet Location</p>
-              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#1F2937' }}>{restaurant?.address || 'Campus Location'}</h3>
-            </div>
+        {error && (
+          <div style={{ padding: '1rem', backgroundColor: '#FEE2E2', color: '#B91C1C', borderRadius: '0.75rem', marginBottom: '1.5rem' }}>
+            {error}
           </div>
-        </Card>
+        )}
 
-        <Card>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ width: '44px', height: '44px', borderRadius: '10px', background: '#ECFDF5', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <CheckCircle2 size={22} />
-            </div>
-            <div>
-              <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#6B7280', fontWeight: 700 }}>Availability State</p>
-              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#10B981' }}>Taking Orders (Open)</h3>
-            </div>
+        {/* Informational Banner */}
+        <div className="info-banner">
+          <Info size={24} className="banner-icon" />
+          <div>
+            <h4>Module Notice: Real-Time Kitchen Orders</h4>
+            <p>
+              Phase 4 handles full menu, pricing, and availability management. Customer checkout, kitchen dispatch queues, and student delivery courier dispatch will become active in Phase 5.
+            </p>
           </div>
-        </Card>
-
-        <Card>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ width: '44px', height: '44px', borderRadius: '10px', background: '#EFF6FF', color: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <TrendingUp size={22} />
-            </div>
-            <div>
-              <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#6B7280', fontWeight: 700 }}>Order Dispatch</p>
-              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#1F2937' }}>Live Station Ready</h3>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      <Card>
-        <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-          <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#F3F4F6', color: '#1F2937', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem' }}>
-            <UtensilsCrossed size={32} />
-          </div>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#1F2937', marginBottom: '0.5rem' }}>
-            Menu & Station Management
-          </h2>
-          <p style={{ color: '#6B7280', maxWidth: '440px', margin: '0 auto 1.5rem', fontSize: '0.925rem' }}>
-            You are authorized as a Restaurant Owner. Kitchen order queue and menu editor views will be enabled in subsequent phases.
-          </p>
-          <Button variant="secondary" size="md" icon={Settings} onClick={() => alert('Menu management workflows will be unlocked in Phase 4.')}>
-            Configure Kitchen Menu
-          </Button>
         </div>
-      </Card>
+
+        {/* Real KPI Stats Grid */}
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-card__icon primary">
+              <UtensilsCrossed size={22} />
+            </div>
+            <div className="stat-card__value">{stats?.total_menu_items ?? 0}</div>
+            <div className="stat-card__label">Total Menu Items</div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-card__icon success">
+              <CheckCircle size={22} />
+            </div>
+            <div className="stat-card__value">{stats?.available_menu_items ?? 0}</div>
+            <div className="stat-card__label">Items In Stock</div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-card__icon warning">
+              <XCircle size={22} />
+            </div>
+            <div className="stat-card__value">{stats?.unavailable_menu_items ?? 0}</div>
+            <div className="stat-card__label">Items Out of Stock</div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-card__icon info">
+              <Sparkles size={22} />
+            </div>
+            <div className="stat-card__value">{stats?.profile_completion_percentage ?? 80}%</div>
+            <div className="stat-card__label">Profile Completion</div>
+            <div className="progress-container">
+              <div
+                className="progress-bar"
+                style={{ width: `${stats?.profile_completion_percentage ?? 80}%` }}
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Links Card */}
+        <div className="form-card">
+          <h3 className="form-card__title">Quick Management Actions</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+            <Link
+              to="/restaurant/menu"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '1.25rem',
+                border: '1px solid #E5E7EB',
+                borderRadius: '0.75rem',
+                textDecoration: 'none',
+                color: '#111827',
+              }}
+            >
+              <div>
+                <strong>Manage Menu Catalog</strong>
+                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.8rem', color: '#6B7280' }}>
+                  Update prices, food stock, & categories
+                </p>
+              </div>
+              <ArrowRight size={18} color="#F97316" />
+            </Link>
+
+            <Link
+              to="/restaurant/profile"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '1.25rem',
+                border: '1px solid #E5E7EB',
+                borderRadius: '0.75rem',
+                textDecoration: 'none',
+                color: '#111827',
+              }}
+            >
+              <div>
+                <strong>Edit Restaurant Profile</strong>
+                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.8rem', color: '#6B7280' }}>
+                  Address, contact number, & outlet branding
+                </p>
+              </div>
+              <ArrowRight size={18} color="#F97316" />
+            </Link>
+
+            <Link
+              to={`/restaurants/${restaurant.id}`}
+              target="_blank"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '1.25rem',
+                border: '1px solid #E5E7EB',
+                borderRadius: '0.75rem',
+                textDecoration: 'none',
+                color: '#111827',
+              }}
+            >
+              <div>
+                <strong>Customer View Preview</strong>
+                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.8rem', color: '#6B7280' }}>
+                  See how campus diners view your menu
+                </p>
+              </div>
+              <ArrowRight size={18} color="#F97316" />
+            </Link>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
-
