@@ -25,7 +25,15 @@ class VehicleType(str, Enum):
     SCOOTER = "SCOOTER"
     WALKING = "WALKING"
     MOTORCYCLE = "MOTORCYCLE"
+    BIKE = "BIKE"
     CAR = "CAR"
+    OTHER = "OTHER"
+
+
+class PartnerAvailability(str, Enum):
+    OFFLINE = "OFFLINE"
+    AVAILABLE = "AVAILABLE"
+    BUSY = "BUSY"
 
 
 class OrderStatus(str, Enum):
@@ -53,6 +61,7 @@ class PaymentStatus(str, Enum):
 class DeliveryStatus(str, Enum):
     ASSIGNED = "ASSIGNED"
     PICKED_UP = "PICKED_UP"
+    OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY"
     DELIVERED = "DELIVERED"
     CANCELLED = "CANCELLED"
 

@@ -37,3 +37,4 @@ def downgrade() -> None:
     op.drop_column("orders", "rejected_at")
     op.drop_column("orders", "accepted_at")
     op.drop_column("orders", "rejection_reason")
+

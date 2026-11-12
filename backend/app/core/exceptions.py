@@ -35,6 +35,15 @@ class DuplicateResourceException(CampusByteException):
         )
 
 
+class ConflictException(CampusByteException):
+    def __init__(self, detail: str, error_code: str = "CONFLICT"):
+        super().__init__(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=detail,
+            error_code=error_code,
+        )
+
+
 class BusinessRuleException(CampusByteException):
     def __init__(self, detail: str, error_code: str = "BUSINESS_RULE_VIOLATION"):
         super().__init__(

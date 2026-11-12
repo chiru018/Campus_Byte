@@ -84,6 +84,19 @@ export default function Navbar() {
                   </Link>
                 </>
               )}
+              {user?.role === 'DELIVERY_PARTNER' && (
+                <>
+                  <Link to="/delivery/available-orders" className="navbar__link">
+                    Available Runs
+                  </Link>
+                  <Link to="/delivery/active-delivery" className="navbar__link">
+                    Active Task
+                  </Link>
+                  <Link to="/delivery/history" className="navbar__link">
+                    Run History
+                  </Link>
+                </>
+              )}
             </>
           ) : (
             <>

@@ -94,3 +94,28 @@ The platform strictly differentiates three participant types:
 3. **Decoupled API Client:**
    - Axios instance with interceptors attaching Bearer tokens and managing 401 unauthenticated purges.
 
+---
+
+## 5. Delivery Partner Subsystem & Order State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING: Customer Checkout
+    PENDING --> ACCEPTED: Restaurant Accepts
+    PENDING --> REJECTED: Restaurant Declines (w/ reason)
+    PENDING --> CANCELLED: Customer Cancels
+    ACCEPTED --> PREPARING: Kitchen Starts Cooking
+    PREPARING --> READY_FOR_PICKUP: Kitchen Marks Food Ready
+    READY_FOR_PICKUP --> PICKED_UP: Courier Claims & Picks Up
+    PICKED_UP --> OUT_FOR_DELIVERY: Courier En Route to Dorm
+    OUT_FOR_DELIVERY --> DELIVERED: Handover Complete & COD Verified
+    DELIVERED --> [*]
+```
+
+### 5.1 Courier Availability & Assignment Rules
+1. **Three-State Lifecycle:** `OFFLINE` (idle/shift off), `AVAILABLE` (polling & accepting runs), `BUSY` (in-flight delivery run).
+2. **Locking & Single Run Invariance:** A courier may only claim one active run at a time. While `BUSY`, attempts to transition to `AVAILABLE` or `OFFLINE` are blocked by the backend until the active delivery is fulfilled.
+3. **Atomic Claiming:** Simultaneous claims on a `READY_FOR_PICKUP` order utilize row-level locking (`with_for_update`) to ensure exactly one winner (201) and subsequent 409 Conflict rejection.
+4. **COD Verification:** Deliveries using Cash on Delivery require verification that the collected physical cash matches the authoritative order total amount before `DELIVERED` state transition is persisted.
+
+

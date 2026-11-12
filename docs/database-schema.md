@@ -92,7 +92,9 @@ Student courier and delivery partner operational profiles.
 | :--- | :--- | :--- | :--- | :--- |
 | `id` | `UUID` | No | `PRIMARY KEY`, `default=uuid4` | Partner identifier |
 | `user_id` | `UUID` | No | `FOREIGN KEY(users.id)`, `UNIQUE`, `INDEX` | Associated user account |
-| `vehicle_type` | `VARCHAR(20)` | No | `default='BICYCLE'` | Enum: `BICYCLE`, `SCOOTER`, `WALKING`, `MOTORCYCLE`, `CAR` |
+| `vehicle_type` | `VARCHAR(20)` | No | `default='BICYCLE'` | Enum: `BICYCLE`, `SCOOTER`, `WALKING`, `MOTORCYCLE`, `BIKE`, `CAR`, `OTHER` |
+| `vehicle_registration_number` | `VARCHAR(50)` | Yes | - | Campus vehicle plate or bike registration tag |
+| `availability_status` | `VARCHAR(20)` | No | `INDEX`, `default='AVAILABLE'` | Enum: `OFFLINE`, `AVAILABLE`, `BUSY` |
 | `is_available` | `BOOLEAN` | No | `INDEX`, `default=TRUE` | On-duty availability status |
 | `created_at` | `TIMESTAMPTZ` | No | `server_default=NOW()` | Registration timestamp |
 | `updated_at` | `TIMESTAMPTZ` | No | `server_default=NOW()`, `onupdate=NOW()` | Update timestamp |
@@ -124,6 +126,12 @@ Core transaction entity linking customer orders with restaurants and couriers.
 | `rejected_at` | `TIMESTAMPTZ` | Yes | - | Timestamp when restaurant rejected order |
 | `preparing_at` | `TIMESTAMPTZ` | Yes | - | Timestamp when food preparation began |
 | `ready_for_pickup_at` | `TIMESTAMPTZ` | Yes | - | Timestamp when kitchen marked food ready for courier pickup |
+| `picked_up_at` | `TIMESTAMPTZ` | Yes | - | Timestamp when courier picked up food package from kitchen |
+| `out_for_delivery_at` | `TIMESTAMPTZ` | Yes | - | Timestamp when courier started transport towards customer dorm |
+| `delivered_at` | `TIMESTAMPTZ` | Yes | - | Timestamp when courier completed delivery handover |
+| `cod_collected` | `BOOLEAN` | No | `default=FALSE` | Flag indicating physical Cash on Delivery receipt |
+| `cod_collected_at` | `TIMESTAMPTZ` | Yes | - | Timestamp when COD payment was confirmed |
+| `cod_collected_by` | `UUID` | Yes | `FOREIGN KEY(users.id)` | Courier user account that collected the cash payment |
 | `idempotency_key` | `VARCHAR(64)` | Yes | `INDEX` | Client-generated duplicate submit token |
 | `created_at` | `TIMESTAMPTZ` | No | `server_default=NOW()` | Timestamp order placed |
 | `updated_at` | `TIMESTAMPTZ` | No | `server_default=NOW()`, `onupdate=NOW()` | Timestamp state updated |
@@ -165,8 +173,12 @@ Audit log of courier assignment dispatches per order.
 | `delivery_partner_id` | `UUID` | No | `FOREIGN KEY(delivery_partners.id)`, `INDEX` | Assigned courier |
 | `assigned_at` | `TIMESTAMPTZ` | No | `server_default=NOW()` | Dispatch timestamp |
 | `picked_up_at` | `TIMESTAMPTZ` | Yes | - | Food pickup timestamp |
+| `started_delivery_at` | `TIMESTAMPTZ` | Yes | - | Courier departure timestamp |
 | `delivered_at` | `TIMESTAMPTZ` | Yes | - | Customer drop timestamp |
-| `delivery_status` | `VARCHAR(20)` | No | `INDEX`, `default='ASSIGNED'` | Enum: `ASSIGNED`, `PICKED_UP`, `DELIVERED`, `CANCELLED` |
+| `completed_at` | `TIMESTAMPTZ` | Yes | - | Assignment completion timestamp |
+| `delivery_status` | `VARCHAR(20)` | No | `INDEX`, `default='ASSIGNED'` | Enum: `ASSIGNED`, `PICKED_UP`, `OUT_FOR_DELIVERY`, `DELIVERED`, `CANCELLED` |
+| `created_at` | `TIMESTAMPTZ` | No | `server_default=NOW()` | Record creation timestamp |
+| `updated_at` | `TIMESTAMPTZ` | No | `server_default=NOW()`, `onupdate=NOW()` | Record modification timestamp |
 
 ---
 
@@ -205,5 +217,6 @@ Server-side token denylist tracking revoked JWT identifiers (jti) upon explicit 
 2. **`20261111_0002_add_revoked_tokens_table.py`**: Added `revoked_tokens` table for server-side JWT session invalidation on logout.
 3. **`20261111_0003_add_order_idempotency_key.py`**: Added `idempotency_key` column with indexing on `orders` table to prevent duplicate checkout submissions.
 4. **`20261112_0004_add_restaurant_order_processing_fields.py`**: Added `rejection_reason`, `accepted_at`, `rejected_at`, `preparing_at`, `ready_for_pickup_at` to `orders`, and added `changed_by_role`, `notes` to `order_status_history`.
+5. **`20261112_0005_add_delivery_partner_and_assignment_fields.py`**: Added `vehicle_registration_number`, `availability_status` to `delivery_partners`; `started_delivery_at`, `completed_at`, `created_at`, `updated_at` to `delivery_assignments`; `picked_up_at`, `out_for_delivery_at`, `delivered_at`, `cod_collected`, `cod_collected_at`, `cod_collected_by` to `orders`.
 
 

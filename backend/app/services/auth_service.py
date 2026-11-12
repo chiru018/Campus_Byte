@@ -123,6 +123,7 @@ def register_delivery_partner(
             db=db,
             user_id=user.id,
             vehicle_type=req.vehicle_type,
+            vehicle_registration_number=req.vehicle_registration_number,
         )
         db.commit()
         db.refresh(user)

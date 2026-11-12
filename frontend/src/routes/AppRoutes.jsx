@@ -26,6 +26,10 @@ import MenuManagementPage from '../pages/restaurant/MenuManagementPage';
 import AddMenuItemPage from '../pages/restaurant/AddMenuItemPage';
 import EditMenuItemPage from '../pages/restaurant/EditMenuItemPage';
 import DeliveryDashboard from '../pages/delivery/DeliveryDashboard';
+import DeliveryAvailableOrdersPage from '../pages/delivery/DeliveryAvailableOrdersPage';
+import DeliveryActivePage from '../pages/delivery/DeliveryActivePage';
+import DeliveryHistoryPage from '../pages/delivery/DeliveryHistoryPage';
+import DeliveryProfilePage from '../pages/delivery/DeliveryProfilePage';
 
 export default function AppRoutes() {
   return (
@@ -40,6 +44,7 @@ export default function AppRoutes() {
         <Route path="/register/customer" element={<CustomerRegisterPage />} />
         <Route path="/register/restaurant-owner" element={<RestaurantOwnerRegisterPage />} />
         <Route path="/register/delivery-partner" element={<DeliveryPartnerRegisterPage />} />
+        <Route path="/delivery/register" element={<DeliveryPartnerRegisterPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
         {/* Customer Protected Routes */}
@@ -65,6 +70,10 @@ export default function AppRoutes() {
         {/* Delivery Partner Protected Routes */}
         <Route element={<ProtectedRoute allowedRoles={['DELIVERY_PARTNER']} />}>
           <Route path="/delivery/dashboard" element={<DeliveryDashboard />} />
+          <Route path="/delivery/available-orders" element={<DeliveryAvailableOrdersPage />} />
+          <Route path="/delivery/active-delivery" element={<DeliveryActivePage />} />
+          <Route path="/delivery/history" element={<DeliveryHistoryPage />} />
+          <Route path="/delivery/profile" element={<DeliveryProfilePage />} />
         </Route>
       </Route>
 

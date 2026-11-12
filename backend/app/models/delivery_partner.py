@@ -1,12 +1,12 @@
 import uuid
 from datetime import datetime
-from typing import TYPE_CHECKING, List
-from sqlalchemy import Boolean, DateTime, ForeignKey, Enum as SAEnum, func
+from typing import TYPE_CHECKING, List, Optional
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, Enum as SAEnum, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Uuid
 
 from app.db.base import Base
-from app.models.enums import VehicleType
+from app.models.enums import VehicleType, PartnerAvailability
 
 if TYPE_CHECKING:
     from app.models.user import User
@@ -31,6 +31,15 @@ class DeliveryPartner(Base):
         SAEnum(VehicleType, native_enum=False, length=20),
         default=VehicleType.BICYCLE,
         nullable=False,
+    )
+    vehicle_registration_number: Mapped[Optional[str]] = mapped_column(
+        String(50), nullable=True
+    )
+    availability_status: Mapped[PartnerAvailability] = mapped_column(
+        SAEnum(PartnerAvailability, native_enum=False, length=20),
+        default=PartnerAvailability.AVAILABLE,
+        nullable=False,
+        index=True,
     )
     is_available: Mapped[bool] = mapped_column(
         Boolean, default=True, nullable=False, index=True

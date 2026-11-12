@@ -47,6 +47,23 @@ from app.services.order_service import (
     mark_order_ready_for_pickup,
     STANDARD_DELIVERY_FEE,
 )
+from app.services.delivery_service import (
+    get_delivery_partner_profile,
+    update_delivery_partner_profile,
+    update_delivery_partner_availability,
+    list_available_orders_for_delivery,
+    accept_delivery_request,
+    get_current_active_delivery,
+    get_assignment_detail_by_order,
+    confirm_restaurant_pickup,
+    start_out_for_delivery,
+    confirm_cod_collection,
+    get_cod_status,
+    complete_delivery,
+    get_delivery_history_list,
+    get_delivery_dashboard_stats,
+    get_order_status_history_for_delivery,
+)
 
 __all__ = [
     "place_order",
@@ -87,5 +104,20 @@ __all__ = [
     "toggle_item_availability",
     "remove_item",
     "get_categories_list",
+    "get_delivery_partner_profile",
+    "update_delivery_partner_profile",
+    "update_delivery_partner_availability",
+    "list_available_orders_for_delivery",
+    "accept_delivery_request",
+    "get_current_active_delivery",
+    "get_assignment_detail_by_order",
+    "confirm_restaurant_pickup",
+    "start_out_for_delivery",
+    "confirm_cod_collection",
+    "get_cod_status",
+    "complete_delivery",
+    "get_delivery_history_list",
+    "get_delivery_dashboard_stats",
+    "get_order_status_history_for_delivery",
 ]
 

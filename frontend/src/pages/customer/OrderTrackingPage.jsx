@@ -33,8 +33,9 @@ const STAGES = [
   { key: 'ACCEPTED', label: 'Order Accepted', desc: 'Kitchen acknowledged order', icon: CheckCircle },
   { key: 'PREPARING', label: 'Preparing Food', desc: 'Freshly cooking your meal', icon: ChefHat },
   { key: 'READY_FOR_PICKUP', label: 'Ready for Pickup', desc: 'Prepared & awaiting courier', icon: PackageCheck },
-  { key: 'OUT_FOR_DELIVERY', label: 'Out for Delivery', desc: 'Campus courier en route', icon: Bike },
-  { key: 'DELIVERED', label: 'Delivered', desc: 'Arrived at your room', icon: Home },
+  { key: 'PICKED_UP', label: 'Order Picked Up', desc: 'Courier collected meal from kitchen', icon: PackageCheck },
+  { key: 'OUT_FOR_DELIVERY', label: 'Out for Delivery', desc: 'Campus courier en route to dorm', icon: Bike },
+  { key: 'DELIVERED', label: 'Delivered', desc: 'Handed over at your campus room', icon: Home },
 ];
 
 export default function OrderTrackingPage() {
@@ -124,11 +125,16 @@ export default function OrderTrackingPage() {
   const isPending = order.order_status === 'PENDING';
 
   // Calculate timeline stage index
-  const stageOrder = ['PENDING', 'ACCEPTED', 'PREPARING', 'READY_FOR_PICKUP', 'OUT_FOR_DELIVERY', 'DELIVERED'];
-  let currentStageIndex = stageOrder.indexOf(order.order_status);
-  if (order.order_status === 'PICKED_UP') {
-    currentStageIndex = stageOrder.indexOf('READY_FOR_PICKUP');
-  }
+  const stageOrder = [
+    'PENDING',
+    'ACCEPTED',
+    'PREPARING',
+    'READY_FOR_PICKUP',
+    'PICKED_UP',
+    'OUT_FOR_DELIVERY',
+    'DELIVERED',
+  ];
+  const currentStageIndex = stageOrder.indexOf(order.order_status);
 
   return (
     <div className="orders-page">
@@ -264,6 +270,55 @@ export default function OrderTrackingPage() {
 
           {/* Right: Order Summary & Delivery Details */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {/* Courier Info Card (shown when assigned) */}
+            {order.delivery_partner_name && (
+              <div
+                style={{
+                  background: 'linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)',
+                  borderRadius: '1rem',
+                  border: '1px solid #FED7AA',
+                  padding: '1.25rem',
+                  boxShadow: '0 2px 6px rgba(249, 115, 22, 0.08)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <Bike size={20} color="#EA580C" />
+                  <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#9A3412', margin: 0 }}>
+                    Assigned Campus Courier
+                  </h3>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <div>
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#1F2937', margin: '0 0 0.15rem' }}>
+                      {order.delivery_partner_name}
+                    </h4>
+                    <p style={{ fontSize: '0.85rem', color: '#C2410C', margin: 0 }}>
+                      Mode: {order.delivery_partner_vehicle || 'Bicycle'}
+                    </p>
+                  </div>
+                  {order.delivery_partner_phone && (
+                    <a
+                      href={`tel:${order.delivery_partner_phone}`}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        background: '#EA580C',
+                        color: '#FFFFFF',
+                        padding: '0.45rem 0.85rem',
+                        borderRadius: '0.5rem',
+                        fontSize: '0.85rem',
+                        fontWeight: '700',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      Call Courier
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Delivery Location Card */}
             <div
               style={{

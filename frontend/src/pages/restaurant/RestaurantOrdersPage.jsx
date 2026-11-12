@@ -480,9 +480,27 @@ export default function RestaurantOrdersPage() {
                           </span>
                         </div>
 
-                        <span className={`status-pill ${statusClass}`}>
-                          {order.order_status.replace(/_/g, ' ')}
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          <span className={`status-pill ${statusClass}`}>
+                            {order.order_status.replace(/_/g, ' ')}
+                          </span>
+                          {order.order_status === 'READY_FOR_PICKUP' && (
+                            order.delivery_partner_id ? (
+                              <span className="badge badge--primary" style={{ fontSize: '0.725rem' }}>
+                                Courier: {order.delivery_partner_name || 'Assigned'}
+                              </span>
+                            ) : (
+                              <span className="badge badge--warning" style={{ fontSize: '0.725rem' }}>
+                                Waiting for Courier
+                              </span>
+                            )
+                          )}
+                          {['PICKED_UP', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(order.order_status) && order.delivery_partner_name && (
+                            <span className="badge badge--info" style={{ fontSize: '0.725rem' }}>
+                              Courier: {order.delivery_partner_name}
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       <div className="card-body-content">
@@ -665,3 +683,4 @@ export default function RestaurantOrdersPage() {
     </div>
   );
 }
+

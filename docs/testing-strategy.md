@@ -23,9 +23,10 @@ To prevent destructive modification to development and production PostgreSQL dat
 | **Menu Management** | `test_menu.py` | Dish creation, invalid restaurant rejection, positive price validation, category filtering, stock toggling, historical order preservation. | 10 |
 | **Customer Orders & Checkout** | `test_orders.py` | Order placement, server-side price computation, delivery fee calculation, duplicate submit idempotency, customer IDOR protection, pending order cancellation. | 13 |
 | **Restaurant Order Processing** | `test_restaurant_orders.py` | Incoming order list, status filtering, customer search, order statistics, live polling notifications, accept/reject workflows, mandatory rejection reason, kitchen preparation lifecycle (`PREPARING` -> `READY_FOR_PICKUP`), owner IDOR protection, concurrency race resolution, audit history timeline. | 17 |
+| **Delivery Management & Tracking** | `test_delivery.py` | Courier registration, vehicle profiles, availability toggle (`AVAILABLE` / `OFFLINE` / `BUSY`), available orders query, atomic order claim & 409 conflict, lifecycle transitions (`PICKED_UP` -> `OUT_FOR_DELIVERY` -> `DELIVERED`), COD confirmation, courier IDOR protection, and customer/restaurant status synchronization. | 16 |
 | **Users** | `test_users.py` | Public user profile retrieval, pagination, duplicate prevention, password hash suppression. | 5 |
 | **Dashboards** | `test_dashboards.py` | Aggregate platform statistics across restaurants, menus, and users. | 1 |
-| **Total** | | | **84 passing** |
+| **Total** | | | **100 passing** |
 
 ---
 

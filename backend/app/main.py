@@ -10,6 +10,7 @@ from app.api.routers import (
     menu,
     orders,
     restaurant_orders,
+    delivery,
     users,
     dashboards,
     system,
@@ -20,7 +21,7 @@ from app.api.routers import (
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.API_VERSION,
-    description="Campus Byte - Food Delivery Platform API (Phase 6 Restaurant Order Management & Processing)",
+    description="Campus Byte - Food Delivery Platform API (Phase 7 Delivery Partner Management & Delivery Tracking)",
     docs_url="/docs",
     redoc_url="/redoc",
 )
@@ -53,6 +54,7 @@ app.include_router(restaurants.router, prefix="/api")
 app.include_router(menu.router, prefix="/api")
 app.include_router(orders.router, prefix="/api")
 app.include_router(restaurant_orders.router, prefix="/api")
+app.include_router(delivery.router, prefix="/api")
 app.include_router(users.router, prefix="/api")
 app.include_router(dashboards.router, prefix="/api")
 app.include_router(system.router, prefix="/api/v1")

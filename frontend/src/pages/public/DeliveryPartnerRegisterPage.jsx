@@ -16,6 +16,7 @@ export default function DeliveryPartnerRegisterPage() {
     password: '',
     confirm_password: '',
     vehicle_type: 'BICYCLE',
+    vehicle_registration_number: '',
   });
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -44,6 +45,7 @@ export default function DeliveryPartnerRegisterPage() {
         password: form.password,
         confirm_password: form.confirm_password,
         vehicle_type: form.vehicle_type,
+        vehicle_registration_number: form.vehicle_registration_number.trim() || undefined,
       });
 
       setSuccessMsg('Courier account registered! Logging you in...');
@@ -148,9 +150,26 @@ export default function DeliveryPartnerRegisterPage() {
                 <option value="SCOOTER">Electric Scooter</option>
                 <option value="WALKING">Walking / On Foot</option>
                 <option value="MOTORCYCLE">Motorcycle</option>
+                <option value="BIKE">Bike</option>
                 <option value="CAR">Car</option>
+                <option value="OTHER">Other</option>
               </select>
             </div>
+          </div>
+
+          <div className="auth-card__field">
+            <label className="auth-card__label" htmlFor="courier-reg">
+              Vehicle Registration / Campus Tag Number
+            </label>
+            <input
+              id="courier-reg"
+              name="vehicle_registration_number"
+              type="text"
+              className="auth-card__input"
+              placeholder="e.g. CAMPUS-BIKE-102 (Optional)"
+              value={form.vehicle_registration_number}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="auth-card__row">

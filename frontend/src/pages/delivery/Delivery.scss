@@ -1,0 +1,559 @@
+@import '../../styles/variables.scss';
+
+// ==============================================================================
+// DELIVERY PORTAL LAYOUT & STYLES
+// ==============================================================================
+
+.delivery-layout {
+  display: flex;
+  min-height: calc(100vh - 72px);
+  background-color: #F9FAFB;
+
+  &__sidebar {
+    width: 280px;
+    background: #FFFFFF;
+    border-right: 1px solid #E5E7EB;
+    padding: 1.75rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    flex-shrink: 0;
+
+    @media (max-width: 900px) {
+      display: none; // Handled by responsive top nav
+    }
+  }
+
+  &__content {
+    flex: 1;
+    padding: 2.25rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+
+    @media (max-width: 640px) {
+      padding: 1.25rem 1rem;
+    }
+  }
+}
+
+// ==============================================================================
+// SIDEBAR COMPONENTS
+// ==============================================================================
+
+.delivery-courier-card {
+  padding: 1.25rem;
+  background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%);
+  border-radius: 14px;
+  border: 1px solid #FED7AA;
+
+  &__name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #9A3412;
+    margin-bottom: 0.2rem;
+  }
+
+  &__info {
+    font-size: 0.825rem;
+    color: #C2410C;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}
+
+.delivery-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.825rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+
+  &--available {
+    background: #ECFDF5;
+    color: #065F46;
+    border: 1px solid #A7F3D0;
+    .dot { background: #10B981; }
+  }
+
+  &--offline {
+    background: #F3F4F6;
+    color: #4B5563;
+    border: 1px solid #E5E7EB;
+    .dot { background: #9CA3AF; }
+  }
+
+  &--busy {
+    background: #FFF7ED;
+    color: #C2410C;
+    border: 1px solid #FED7AA;
+    .dot { background: #F97316; }
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+}
+
+.delivery-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  &__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    color: #4B5563;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.925rem;
+    transition: all 0.15s ease-in-out;
+
+    &:hover {
+      background: #F3F4F6;
+      color: #1F2937;
+    }
+
+    &--active {
+      background: #FFEDD5;
+      color: #EA580C;
+      font-weight: 700;
+
+      &:hover {
+        background: #FFEDD5;
+      }
+    }
+
+    .link-inner {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .badge-count {
+      background: #EA580C;
+      color: #FFFFFF;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+  }
+}
+
+// ==============================================================================
+// METRICS & CARDS
+// ==============================================================================
+
+.delivery-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.delivery-metric-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &--orange { background: #FFEDD5; color: #EA580C; }
+    &--green { background: #ECFDF5; color: #10B981; }
+    &--blue { background: #EFF6FF; color: #3B82F6; }
+    &--purple { background: #F3E8FF; color: #8B5CF6; }
+    &--grey { background: #F3F4F6; color: #6B7280; }
+  }
+
+  &__label {
+    font-size: 0.785rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6B7280;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.25rem;
+  }
+
+  &__value {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #1F2937;
+  }
+}
+
+// ==============================================================================
+// AVAILABILITY TOGGLE BAR
+// ==============================================================================
+
+.availability-bar {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  &__status-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #1F2937;
+  }
+
+  &__btn-group {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
+// ==============================================================================
+// ACTIVE DELIVERY SPOTLIGHT & STEPPER
+// ==============================================================================
+
+.active-delivery-card {
+  background: #FFFFFF;
+  border: 1px solid #FED7AA;
+  border-left: 5px solid #F97316;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.08);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  &__title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #9A3412;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__locations {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+    background: #FFF7ED;
+    padding: 1.25rem;
+    border-radius: 10px;
+    border: 1px solid #FFEDD5;
+  }
+
+  &__loc-item {
+    h4 {
+      font-size: 0.785rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #C2410C;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    p {
+      font-weight: 600;
+      color: #1F2937;
+      margin-bottom: 0.2rem;
+      font-size: 0.95rem;
+    }
+    span {
+      font-size: 0.85rem;
+      color: #6B7280;
+    }
+  }
+}
+
+.delivery-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1.5rem 0;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 18px;
+    left: 40px;
+    right: 40px;
+    height: 3px;
+    background: #E5E7EB;
+    z-index: 1;
+  }
+
+  &__step {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    flex: 1;
+
+    .step-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 3px solid #E5E7EB;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9CA3AF;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+
+    .step-label {
+      font-size: 0.785rem;
+      font-weight: 600;
+      color: #6B7280;
+      text-align: center;
+    }
+
+    &--completed {
+      .step-circle {
+        background: #10B981;
+        border-color: #10B981;
+        color: #FFFFFF;
+      }
+      .step-label {
+        color: #065F46;
+        font-weight: 700;
+      }
+    }
+
+    &--active {
+      .step-circle {
+        background: #EA580C;
+        border-color: #FED7AA;
+        color: #FFFFFF;
+        box-shadow: 0 0 0 4px #FFEDD5;
+      }
+      .step-label {
+        color: #C2410C;
+        font-weight: 800;
+      }
+    }
+  }
+}
+
+// ==============================================================================
+// AVAILABLE ORDERS GRID & CARDS
+// ==============================================================================
+
+.available-orders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.available-order-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 1.35rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
+    border-color: #FED7AA;
+  }
+
+  &__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+
+  &__rest-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1F2937;
+    margin-bottom: 0.15rem;
+  }
+
+  &__rest-addr {
+    font-size: 0.825rem;
+    color: #6B7280;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  &__summary {
+    padding: 0.75rem;
+    background: #F9FAFB;
+    border-radius: 8px;
+    margin: 0.85rem 0;
+    font-size: 0.85rem;
+    color: #4B5563;
+
+    .items-title {
+      font-weight: 700;
+      color: #1F2937;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid #F3F4F6;
+  }
+
+  &__price {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #1F2937;
+  }
+}
+
+// ==============================================================================
+// MODAL & OVERLAY STYLES
+// ==============================================================================
+
+.delivery-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.delivery-modal {
+  background: #FFFFFF;
+  border-radius: 16px;
+  max-width: 480px;
+  width: 100%;
+  padding: 2rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  &__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: #FFEDD5;
+    color: #EA580C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1F2937;
+  }
+
+  &__amount-box {
+    background: #FFF7ED;
+    border: 1px solid #FED7AA;
+    border-radius: 10px;
+    padding: 1.25rem;
+    text-align: center;
+    margin: 1.25rem 0;
+
+    .amount-label {
+      font-size: 0.825rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #9A3412;
+      margin-bottom: 0.25rem;
+    }
+
+    .amount-val {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #C2410C;
+    }
+  }
+
+  &__checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.925rem;
+    color: #374151;
+    cursor: pointer;
+
+    input {
+      margin-top: 3px;
+      width: 18px;
+      height: 18px;
+      accent-color: #EA580C;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+}

@@ -3,6 +3,7 @@ from decimal import Decimal
 from datetime import datetime
 from typing import TYPE_CHECKING, List, Optional
 from sqlalchemy import (
+    Boolean,
     String,
     DateTime,
     Numeric,
@@ -95,6 +96,26 @@ class Order(Base):
     )
     ready_for_pickup_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True), nullable=True
+    )
+    picked_up_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    out_for_delivery_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    delivered_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    cod_collected: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=False
+    )
+    cod_collected_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    cod_collected_by: Mapped[Optional[uuid.UUID]] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False

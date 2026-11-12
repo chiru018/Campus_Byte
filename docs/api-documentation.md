@@ -385,3 +385,146 @@ All endpoints in this section require `RESTAURANT_OWNER` role authentication and
 - **Status:** `200 OK` / `400 Bad Request` / `403 Forbidden` / `404 Not Found`
 - **State Transition:** `PREPARING` -> `READY_FOR_PICKUP` (sets `ready_for_pickup_at` timestamp). Ready for delivery partner dispatch in Phase 7.
 
+---
+
+## 6. Delivery Partner & Tracking Endpoints (`/api/delivery`)
+
+All endpoints in this section require `DELIVERY_PARTNER` role authentication via Bearer token or HttpOnly cookie.
+
+### 6.1 Get Courier Profile
+- **Endpoint:** `GET /api/delivery/profile`
+- **Access:** `DELIVERY_PARTNER`
+- **Status:** `200 OK`
+- **Response Body:** `DeliveryPartnerResponse` including vehicle type, vehicle registration number, availability status, active status flag, and user contact info.
+
+### 6.2 Update Courier Profile
+- **Endpoint:** `PATCH /api/delivery/profile`
+- **Access:** `DELIVERY_PARTNER`
+- **Request Body:**
+  ```json
+  {
+    "vehicle_type": "SCOOTER",
+    "vehicle_registration_number": "CAMPUS-SCOOT-42",
+    "phone_number": "+1555123456"
+  }
+  ```
+- **Status:** `200 OK`
+
+### 6.3 Update Availability Status
+- **Endpoint:** `PATCH /api/delivery/availability`
+- **Access:** `DELIVERY_PARTNER`
+- **Business Rule:** Couriers with an active delivery in progress cannot set status to `AVAILABLE` or `OFFLINE` until the current delivery task is completed.
+- **Request Body:**
+  ```json
+  {
+    "availability_status": "AVAILABLE"
+  }
+  ```
+- **Status:** `200 OK` / `400 Bad Request` (if active delivery in progress)
+
+### 6.4 Get Dashboard Statistics
+- **Endpoint:** `GET /api/delivery/dashboard/statistics`
+- **Access:** `DELIVERY_PARTNER`
+- **Status:** `200 OK`
+- **Response Body:**
+  ```json
+  {
+    "available_requests_count": 3,
+    "active_delivery_count": 1,
+    "completed_deliveries_count": 14,
+    "total_deliveries_count": 15,
+    "total_cod_collected": "245.50",
+    "availability_status": "BUSY"
+  }
+  ```
+
+### 6.5 List Available Orders
+- **Endpoint:** `GET /api/delivery/available-orders`
+- **Access:** `DELIVERY_PARTNER` (Must be in `AVAILABLE` status)
+- **Query Parameters:**
+  - `page`: Page number (default: 1)
+  - `size`: Page size (default: 20, max: 100)
+- **Status:** `200 OK` / `400 Bad Request` (if partner is OFFLINE)
+- **Response Body:** `AvailableDeliveryOrderListResponse` with list of unassigned `READY_FOR_PICKUP` orders from active dining outlets.
+
+### 6.6 Accept / Claim Delivery Run
+- **Endpoint:** `POST /api/delivery/assignments/{order_id}/accept`
+- **Access:** `DELIVERY_PARTNER` (Must be `AVAILABLE` with no other active delivery)
+- **Business Rule:** Atomic claim protected by concurrency row locking. If claimed simultaneously by another courier, returns `409 Conflict`.
+- **Status:** `201 Created` / `400 Bad Request` / `409 Conflict`
+- **Side Effect:** Automatically sets courier `availability_status = BUSY` and inserts `DeliveryAssignment`.
+
+### 6.7 Get Current Active Delivery
+- **Endpoint:** `GET /api/delivery/active-delivery`
+- **Access:** `DELIVERY_PARTNER`
+- **Status:** `200 OK`
+- **Response Body:** `ActiveDeliveryResponse` (or `null` if courier is currently idle) with complete restaurant pickup details, dorm customer details, and ordered item breakdown.
+
+### 6.8 Get Assignment Details
+- **Endpoint:** `GET /api/delivery/assignments/{order_id}`
+- **Access:** `DELIVERY_PARTNER` (Ownership enforced: 403 Forbidden for other couriers)
+- **Status:** `200 OK` / `403 Forbidden` / `404 Not Found`
+
+### 6.9 Confirm Package Pickup from Restaurant
+- **Endpoint:** `PATCH /api/delivery/assignments/{order_id}/pickup`
+- **Access:** `DELIVERY_PARTNER` (Assigned courier only)
+- **Business Rule:** Order must be in `READY_FOR_PICKUP` status.
+- **Status:** `200 OK` / `400 Bad Request` / `403 Forbidden`
+- **State Transition:** `READY_FOR_PICKUP` -> `PICKED_UP` (records `picked_up_at` timestamp).
+
+### 6.10 Start Campus Delivery Run
+- **Endpoint:** `PATCH /api/delivery/assignments/{order_id}/start-delivery`
+- **Access:** `DELIVERY_PARTNER` (Assigned courier only)
+- **Business Rule:** Order must be in `PICKED_UP` status.
+- **Status:** `200 OK` / `400 Bad Request` / `403 Forbidden`
+- **State Transition:** `PICKED_UP` -> `OUT_FOR_DELIVERY` (records `out_for_delivery_at` timestamp).
+
+### 6.11 Explicit Cash on Delivery Confirmation
+- **Endpoint:** `POST /api/delivery/assignments/{order_id}/confirm-cod`
+- **Access:** `DELIVERY_PARTNER` (Assigned courier only)
+- **Business Rule:** Validates that submitted amount matches order payable total within 0.01 tolerance.
+- **Request Body:**
+  ```json
+  {
+    "confirm_cash_collected": true,
+    "collected_amount": 19.00
+  }
+  ```
+- **Status:** `200 OK` / `400 Bad Request`
+- **Side Effect:** Sets `order.payment_status = PAID`, `order.cod_collected = true`.
+
+### 6.12 Inspect COD Status
+- **Endpoint:** `GET /api/delivery/assignments/{order_id}/cod-status`
+- **Access:** `DELIVERY_PARTNER` (Assigned courier only)
+- **Status:** `200 OK`
+- **Response Body:** `CODStatusResponse` with payment method, total amount, collection status, and timestamp.
+
+### 6.13 Complete Order Delivery
+- **Endpoint:** `PATCH /api/delivery/assignments/{order_id}/complete`
+- **Access:** `DELIVERY_PARTNER` (Assigned courier only)
+- **Business Rule:** Order must be in `OUT_FOR_DELIVERY` status. For COD orders, cash collection must be confirmed.
+- **Request Body (Optional for pre-confirmed COD):**
+  ```json
+  {
+    "confirm_delivered": true,
+    "confirm_cash_collected": true,
+    "collected_amount": 19.00
+  }
+  ```
+- **Status:** `200 OK` / `400 Bad Request` / `403 Forbidden`
+- **State Transition:** `OUT_FOR_DELIVERY` -> `DELIVERED` (records `delivered_at` timestamp, closes assignment, resets partner to `AVAILABLE`).
+
+### 6.14 Get Delivery History
+- **Endpoint:** `GET /api/delivery/history`
+- **Access:** `DELIVERY_PARTNER`
+- **Query Parameters:** `status` (ALL, DELIVERED, CANCELLED), `page`, `size`
+- **Status:** `200 OK`
+- **Response Body:** `DeliveryHistoryListResponse` with historical delivery entries.
+
+### 6.15 Get Assignment Lifecycle History
+- **Endpoint:** `GET /api/delivery/assignments/{order_id}/history`
+- **Access:** `DELIVERY_PARTNER` (Assigned courier only)
+- **Status:** `200 OK`
+- **Response Body:** List of `OrderStatusHistoryResponse` objects chronologically detailing transitions.
+
+

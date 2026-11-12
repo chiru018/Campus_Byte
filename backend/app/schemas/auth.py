@@ -50,6 +50,7 @@ class DeliveryPartnerRegisterRequest(BaseModel):
     password: str = Field(..., min_length=8, max_length=128, description="Strong account password")
     confirm_password: str = Field(..., min_length=8, max_length=128, description="Password confirmation")
     vehicle_type: VehicleType = Field(default=VehicleType.BICYCLE, description="Courier vehicle mode")
+    vehicle_registration_number: Optional[str] = Field(None, max_length=50, description="Vehicle plate or campus tag number")
 
     @model_validator(mode="after")
     def validate_password_and_match(self):

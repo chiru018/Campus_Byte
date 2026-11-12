@@ -12,7 +12,15 @@ sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), ".."
 
 from app.db.base import Base
 from app.db.session import get_db
-from app.models import User, Restaurant, MenuItem, UserRole
+from app.models import (
+    User,
+    Restaurant,
+    MenuItem,
+    DeliveryPartner,
+    UserRole,
+    VehicleType,
+    PartnerAvailability,
+)
 from app.core.security import get_password_hash, create_access_token
 from app.main import app
 
@@ -203,10 +211,68 @@ def sample_delivery_partner(db_session) -> User:
 
 
 @pytest.fixture
+def sample_delivery_profile(db_session, sample_delivery_partner) -> DeliveryPartner:
+    """Pre-created DeliveryPartner profile fixture."""
+    partner = DeliveryPartner(
+        user_id=sample_delivery_partner.id,
+        vehicle_type=VehicleType.BICYCLE,
+        vehicle_registration_number="CAMPUS-BIKE-42",
+        availability_status=PartnerAvailability.AVAILABLE,
+        is_available=True,
+    )
+    db_session.add(partner)
+    db_session.commit()
+    db_session.refresh(partner)
+    return partner
+
+
+@pytest.fixture
 def delivery_headers(sample_delivery_partner) -> dict:
     """Authorization header fixture for sample_delivery_partner."""
     token, _, _ = create_access_token(sample_delivery_partner.id, sample_delivery_partner.role.value)
     return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+def other_delivery_partner(db_session) -> User:
+    """Secondary Delivery Partner User fixture for IDOR tests."""
+    courier = User(
+        id=uuid.uuid4(),
+        full_name="Sam Scooter",
+        email="sam.scooter@campusbyte.com",
+        phone_number="+1777333444",
+        password_hash=get_password_hash("SamSecret123!"),
+        role=UserRole.DELIVERY_PARTNER,
+        is_active=True,
+    )
+    db_session.add(courier)
+    db_session.commit()
+    db_session.refresh(courier)
+    return courier
+
+
+@pytest.fixture
+def other_delivery_profile(db_session, other_delivery_partner) -> DeliveryPartner:
+    """Pre-created DeliveryPartner profile fixture for secondary partner."""
+    partner = DeliveryPartner(
+        user_id=other_delivery_partner.id,
+        vehicle_type=VehicleType.SCOOTER,
+        vehicle_registration_number="SCOOT-99",
+        availability_status=PartnerAvailability.AVAILABLE,
+        is_available=True,
+    )
+    db_session.add(partner)
+    db_session.commit()
+    db_session.refresh(partner)
+    return partner
+
+
+@pytest.fixture
+def other_delivery_headers(other_delivery_partner) -> dict:
+    """Authorization header fixture for other_delivery_partner."""
+    token, _, _ = create_access_token(other_delivery_partner.id, other_delivery_partner.role.value)
+    return {"Authorization": f"Bearer {token}"}
+
 
 
 

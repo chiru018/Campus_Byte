@@ -42,6 +42,13 @@ def _enrich_order_metadata(order: Order) -> Order:
         setattr(order, "customer_phone", order.customer.phone_number)
         setattr(order, "customer_email", order.customer.email)
 
+    if order.delivery_partner:
+        if hasattr(order.delivery_partner, "user") and order.delivery_partner.user:
+            setattr(order, "delivery_partner_name", order.delivery_partner.user.full_name)
+            setattr(order, "delivery_partner_phone", order.delivery_partner.user.phone_number)
+        if hasattr(order.delivery_partner, "vehicle_type") and order.delivery_partner.vehicle_type:
+            setattr(order, "delivery_partner_vehicle", getattr(order.delivery_partner.vehicle_type, "value", str(order.delivery_partner.vehicle_type)))
+
     # Attach dish image URLs if available from the underlying menu item
     if order.order_items:
         for item in order.order_items:

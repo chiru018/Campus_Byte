@@ -297,6 +297,38 @@ export default function RestaurantOrderDetailPage() {
                       📍 {order.delivery_address}
                     </p>
                   </div>
+
+                  {/* Courier Assignment Section */}
+                  {order.delivery_partner_id ? (
+                    <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid #F1F5F9' }}>
+                      <span style={{ display: 'block', fontSize: '0.8rem', color: '#64748B', textTransform: 'uppercase', fontWeight: '700', marginBottom: '0.25rem' }}>
+                        Assigned Campus Courier
+                      </span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <strong style={{ fontSize: '0.95rem', color: '#0F172A' }}>
+                            {order.delivery_partner_name || 'Active Courier'}
+                          </strong>
+                          {order.delivery_partner_vehicle && (
+                            <span style={{ fontSize: '0.825rem', color: '#64748B', marginLeft: '0.5rem' }}>
+                              (Mode: {order.delivery_partner_vehicle})
+                            </span>
+                          )}
+                        </div>
+                        {order.delivery_partner_phone && (
+                          <span style={{ fontSize: '0.85rem', color: '#F59E0B', fontWeight: 600 }}>
+                            📞 {order.delivery_partner_phone}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    order.order_status === 'READY_FOR_PICKUP' && (
+                      <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid #F1F5F9', color: '#D97706', fontSize: '0.875rem', fontWeight: 600 }}>
+                        ⏳ Waiting for available campus delivery partner to accept pickup...
+                      </div>
+                    )
+                  )}
                 </div>
 
                 {/* Food Items Ordered Table */}
@@ -600,3 +632,4 @@ export default function RestaurantOrderDetailPage() {
     </div>
   );
 }
+

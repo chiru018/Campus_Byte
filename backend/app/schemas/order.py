@@ -70,6 +70,13 @@ class OrderResponse(OrderBase):
     rejected_at: Optional[datetime] = None
     preparing_at: Optional[datetime] = None
     ready_for_pickup_at: Optional[datetime] = None
+    picked_up_at: Optional[datetime] = None
+    out_for_delivery_at: Optional[datetime] = None
+    delivered_at: Optional[datetime] = None
+    delivery_partner_name: Optional[str] = None
+    delivery_partner_phone: Optional[str] = None
+    delivery_partner_vehicle: Optional[str] = None
+    cod_collected: Optional[bool] = False
     created_at: datetime
     updated_at: datetime
     order_items: List[OrderItemResponse] = []
