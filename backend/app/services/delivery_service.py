@@ -573,3 +573,4 @@ def get_order_status_history_for_delivery(
 
     history_records = crud_order.get_order_status_history(db, order_id)
     return [OrderStatusHistoryResponse.model_validate(h) for h in history_records]
+

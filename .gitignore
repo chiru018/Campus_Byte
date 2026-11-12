@@ -76,3 +76,10 @@ logs/
 # Docker Local State
 postgres_data/
 
+# SQLite Local Database Files
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+

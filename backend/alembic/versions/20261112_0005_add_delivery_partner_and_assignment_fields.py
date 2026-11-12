@@ -123,3 +123,4 @@ def downgrade() -> None:
     op.drop_index("ix_delivery_partners_availability_status", "delivery_partners")
     op.drop_column("delivery_partners", "availability_status")
     op.drop_column("delivery_partners", "vehicle_registration_number")
+

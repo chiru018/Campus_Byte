@@ -474,3 +474,4 @@ def test_customer_and_restaurant_synchronization(
     final_cust = client.get(f"/api/orders/{order_id}", headers=customer_headers).json()
     assert final_cust["order_status"] == "DELIVERED"
     assert final_cust["delivered_at"] is not None
+

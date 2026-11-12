@@ -42,10 +42,23 @@ async def campus_byte_exception_handler(request: Request, exc: CampusByteExcepti
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Startup event to ensure tables exist
+@app.on_event("startup")
+def startup_event():
+    import app.models  # noqa: F401
+    from app.db.base import Base
+    from app.db.session import engine
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).warning(f"Database table initialization notice: {exc}")
 
 # Modular API Routers mounted under /api
 app.include_router(auth.router, prefix="/api")
