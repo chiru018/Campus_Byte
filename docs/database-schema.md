@@ -119,6 +119,11 @@ Core transaction entity linking customer orders with restaurants and couriers.
 | `payment_method` | `VARCHAR(30)` | No | `default='CASH_ON_DELIVERY'` | Enum: `CASH_ON_DELIVERY` |
 | `payment_status` | `VARCHAR(20)` | No | `INDEX`, `default='PENDING'` | Enum: `PENDING`, `PAID`, `FAILED` |
 | `order_status` | `VARCHAR(30)` | No | `INDEX`, `default='PENDING'` | Full order state machine |
+| `rejection_reason` | `VARCHAR(500)` | Yes | - | Reason provided by restaurant if order is rejected |
+| `accepted_at` | `TIMESTAMPTZ` | Yes | - | Timestamp when restaurant accepted order |
+| `rejected_at` | `TIMESTAMPTZ` | Yes | - | Timestamp when restaurant rejected order |
+| `preparing_at` | `TIMESTAMPTZ` | Yes | - | Timestamp when food preparation began |
+| `ready_for_pickup_at` | `TIMESTAMPTZ` | Yes | - | Timestamp when kitchen marked food ready for courier pickup |
 | `idempotency_key` | `VARCHAR(64)` | Yes | `INDEX` | Client-generated duplicate submit token |
 | `created_at` | `TIMESTAMPTZ` | No | `server_default=NOW()` | Timestamp order placed |
 | `updated_at` | `TIMESTAMPTZ` | No | `server_default=NOW()`, `onupdate=NOW()` | Timestamp state updated |
@@ -175,6 +180,8 @@ Immutable audit log tracking every order state transition.
 | `previous_status` | `VARCHAR(30)` | Yes | - | State prior to change |
 | `new_status` | `VARCHAR(30)` | No | - | New state |
 | `changed_by` | `UUID` | Yes | `FOREIGN KEY(users.id)`, `INDEX` | User triggering transition |
+| `changed_by_role` | `VARCHAR(30)` | Yes | - | Role of user triggering change (e.g. CUSTOMER, RESTAURANT_OWNER, DELIVERY_PARTNER) |
+| `notes` | `VARCHAR(500)` | Yes | - | Descriptive audit details or reasons (e.g. rejection explanation) |
 | `created_at` | `TIMESTAMPTZ` | No | `server_default=NOW()` | Audit log timestamp |
 
 ---
@@ -189,4 +196,14 @@ Server-side token denylist tracking revoked JWT identifiers (jti) upon explicit 
 | `user_id` | `UUID` | No | `FOREIGN KEY(users.id)`, `INDEX` | User owning the revoked token |
 | `revoked_at` | `TIMESTAMPTZ` | No | `server_default=NOW()` | Exact revocation timestamp |
 | `expires_at` | `TIMESTAMPTZ` | No | `INDEX` | Token expiration timestamp for cleanup |
+
+---
+
+## 3. Alembic Migration History
+
+1. **`20261111_0001_initial_schema.py`**: Initial schema defining core 9 relational tables, foreign key constraints, indexes, and positive amount checks.
+2. **`20261111_0002_add_revoked_tokens_table.py`**: Added `revoked_tokens` table for server-side JWT session invalidation on logout.
+3. **`20261111_0003_add_order_idempotency_key.py`**: Added `idempotency_key` column with indexing on `orders` table to prevent duplicate checkout submissions.
+4. **`20261112_0004_add_restaurant_order_processing_fields.py`**: Added `rejection_reason`, `accepted_at`, `rejected_at`, `preparing_at`, `ready_for_pickup_at` to `orders`, and added `changed_by_role`, `notes` to `order_status_history`.
+
 

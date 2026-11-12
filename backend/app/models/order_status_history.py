@@ -32,6 +32,8 @@ class OrderStatusHistory(Base):
         nullable=True,
         index=True,
     )
+    changed_by_role: Mapped[Optional[str]] = mapped_column(String(30), nullable=True)
+    notes: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

@@ -27,3 +27,4 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_index("ix_orders_idempotency_key", table_name="orders")
     op.drop_column("orders", "idempotency_key")
+

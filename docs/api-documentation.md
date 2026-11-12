@@ -284,3 +284,104 @@
   }
   ```
 - **Response Body:** Updated `OrderResponse` with `order_status: "CANCELLED"` and appended history transition.
+
+---
+
+## 5. Restaurant Order Processing Endpoints (`/api/restaurant/orders`)
+
+All endpoints in this section require `RESTAURANT_OWNER` role authentication and enforce restaurant ownership verification (an owner cannot access or transition another restaurant's orders).
+
+### 5.1 List Restaurant Orders
+- **Endpoint:** `GET /api/restaurant/orders`
+- **Access:** `RESTAURANT_OWNER`
+- **Query Parameters:**
+  - `status`: Optional filter by `OrderStatus` (`PENDING`, `ACCEPTED`, `PREPARING`, `READY_FOR_PICKUP`, `OUT_FOR_DELIVERY`, `DELIVERED`, `CANCELLED`, `REJECTED`)
+  - `search`: Case-insensitive substring match on order UUID, customer name, email, or dorm address
+  - `date`: Filter orders by calendar date (`YYYY-MM-DD`)
+  - `page`: Page number (default: 1)
+  - `size`: Page size (default: 20, max: 100)
+- **Status:** `200 OK`
+- **Response Body:** `OrderListResponse` with total count, pagination metadata, and list of orders with customer contact and order items.
+
+### 5.2 Get Restaurant Order Statistics
+- **Endpoint:** `GET /api/restaurant/orders/statistics`
+- **Access:** `RESTAURANT_OWNER`
+- **Status:** `200 OK`
+- **Response Body:**
+  ```json
+  {
+    "total_orders": 45,
+    "pending_orders": 3,
+    "accepted_orders": 2,
+    "preparing_orders": 4,
+    "ready_for_pickup_orders": 1,
+    "delivered_orders": 32,
+    "cancelled_orders": 2,
+    "rejected_orders": 1,
+    "today_orders": 12,
+    "today_revenue": "184.50"
+  }
+  ```
+
+### 5.3 Live Incoming Order Notifications (Polling)
+- **Endpoint:** `GET /api/restaurant/orders/notifications`
+- **Access:** `RESTAURANT_OWNER`
+- **Query Parameters:**
+  - `since`: ISO timestamp (e.g. `2026-11-12T10:00:00Z`). If omitted, checks for new pending orders created in the last 60 seconds.
+- **Status:** `200 OK`
+- **Response Body:**
+  ```json
+  {
+    "new_pending_count": 2,
+    "has_new_orders": true,
+    "latest_orders": [ ... ],
+    "server_timestamp": "2026-11-12T10:05:00.123456Z"
+  }
+  ```
+
+### 5.4 Get Order Detail
+- **Endpoint:** `GET /api/restaurant/orders/{order_id}`
+- **Access:** `RESTAURANT_OWNER` (Ownership verified)
+- **Status:** `200 OK` / `403 Forbidden` / `404 Not Found`
+- **Response Body:** Full `OrderResponse` including customer phone/email, dorm room delivery location, snapshot items, pricing breakdown, timestamps (`accepted_at`, `preparing_at`, `ready_for_pickup_at`, `rejected_at`), and status history timeline.
+
+### 5.5 Get Order Status History Timeline
+- **Endpoint:** `GET /api/restaurant/orders/{order_id}/history`
+- **Access:** `RESTAURANT_OWNER` (Ownership verified)
+- **Status:** `200 OK` / `403 Forbidden` / `404 Not Found`
+- **Response Body:** List of `OrderStatusHistoryResponse` entries chronologically sorted, detailing `previous_status`, `new_status`, `changed_by_role`, `notes`, and `created_at`.
+
+### 5.6 Accept Order
+- **Endpoint:** `PATCH /api/restaurant/orders/{order_id}/accept`
+- **Access:** `RESTAURANT_OWNER` (Ownership verified)
+- **Business Rule:** Order must be in `PENDING` status. Atomic state locking prevents concurrency collisions with customer cancellations.
+- **Status:** `200 OK` / `400 Bad Request` / `403 Forbidden` / `404 Not Found`
+- **State Transition:** `PENDING` -> `ACCEPTED` (sets `accepted_at` timestamp).
+
+### 5.7 Reject Order
+- **Endpoint:** `PATCH /api/restaurant/orders/{order_id}/reject`
+- **Access:** `RESTAURANT_OWNER` (Ownership verified)
+- **Business Rule:** Order must be in `PENDING` status. Requires explicit `reason` of 5+ characters.
+- **Request Body:**
+  ```json
+  {
+    "reason": "Kitchen at peak capacity, out of burger buns."
+  }
+  ```
+- **Status:** `200 OK` / `400 Bad Request` / `422 Unprocessable Entity` / `403 Forbidden` / `404 Not Found`
+- **State Transition:** `PENDING` -> `REJECTED` (sets `rejected_at` timestamp and records reason).
+
+### 5.8 Start Food Preparation
+- **Endpoint:** `PATCH /api/restaurant/orders/{order_id}/start-preparation`
+- **Access:** `RESTAURANT_OWNER` (Ownership verified)
+- **Business Rule:** Order must be in `ACCEPTED` status.
+- **Status:** `200 OK` / `400 Bad Request` / `403 Forbidden` / `404 Not Found`
+- **State Transition:** `ACCEPTED` -> `PREPARING` (sets `preparing_at` timestamp).
+
+### 5.9 Mark Order Ready for Courier Pickup
+- **Endpoint:** `PATCH /api/restaurant/orders/{order_id}/ready-for-pickup`
+- **Access:** `RESTAURANT_OWNER` (Ownership verified)
+- **Business Rule:** Order must be in `PREPARING` status.
+- **Status:** `200 OK` / `400 Bad Request` / `403 Forbidden` / `404 Not Found`
+- **State Transition:** `PREPARING` -> `READY_FOR_PICKUP` (sets `ready_for_pickup_at` timestamp). Ready for delivery partner dispatch in Phase 7.
+

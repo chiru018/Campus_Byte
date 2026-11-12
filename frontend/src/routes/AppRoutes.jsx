@@ -20,6 +20,8 @@ import OrderTrackingPage from '../pages/customer/OrderTrackingPage';
 
 import RestaurantDashboard from '../pages/restaurant/RestaurantDashboard';
 import RestaurantProfilePage from '../pages/restaurant/RestaurantProfilePage';
+import RestaurantOrdersPage from '../pages/restaurant/RestaurantOrdersPage';
+import RestaurantOrderDetailPage from '../pages/restaurant/RestaurantOrderDetailPage';
 import MenuManagementPage from '../pages/restaurant/MenuManagementPage';
 import AddMenuItemPage from '../pages/restaurant/AddMenuItemPage';
 import EditMenuItemPage from '../pages/restaurant/EditMenuItemPage';
@@ -52,6 +54,8 @@ export default function AppRoutes() {
         {/* Restaurant Owner Protected Routes */}
         <Route element={<ProtectedRoute allowedRoles={['RESTAURANT_OWNER']} />}>
           <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
+          <Route path="/restaurant/orders" element={<RestaurantOrdersPage />} />
+          <Route path="/restaurant/orders/:orderId" element={<RestaurantOrderDetailPage />} />
           <Route path="/restaurant/profile" element={<RestaurantProfilePage />} />
           <Route path="/restaurant/menu" element={<MenuManagementPage />} />
           <Route path="/restaurant/menu/add" element={<AddMenuItemPage />} />

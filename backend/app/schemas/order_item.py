@@ -1,5 +1,6 @@
 import uuid
 from decimal import Decimal
+from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -19,6 +20,7 @@ class OrderItemCreate(BaseModel):
 class OrderItemResponse(OrderItemBase):
     id: uuid.UUID
     order_id: uuid.UUID
+    image_url: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

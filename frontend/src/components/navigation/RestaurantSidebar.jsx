@@ -5,11 +5,12 @@ import {
   Store,
   UtensilsCrossed,
   PlusCircle,
+  ClipboardList,
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-export default function RestaurantSidebar({ restaurantName, isOpen }) {
+export default function RestaurantSidebar({ restaurantName, isOpen, pendingCount = 0 }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -38,6 +39,32 @@ export default function RestaurantSidebar({ restaurantName, isOpen }) {
         >
           <LayoutDashboard size={18} />
           <span>Overview</span>
+        </NavLink>
+
+        <NavLink
+          to="/restaurant/orders"
+          className={({ isActive }) =>
+            `restaurant-sidebar__link ${isActive ? 'active' : ''}`
+          }
+        >
+          <ClipboardList size={18} />
+          <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <span>Orders</span>
+            {pendingCount > 0 && (
+              <span
+                style={{
+                  background: '#EF4444',
+                  color: '#FFFFFF',
+                  borderRadius: '9999px',
+                  padding: '2px 7px',
+                  fontSize: '0.75rem',
+                  fontWeight: '700',
+                }}
+              >
+                {pendingCount}
+              </span>
+            )}
+          </span>
         </NavLink>
 
         <NavLink
@@ -86,4 +113,3 @@ export default function RestaurantSidebar({ restaurantName, isOpen }) {
     </aside>
   );
 }
-

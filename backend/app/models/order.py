@@ -81,6 +81,21 @@ class Order(Base):
     idempotency_key: Mapped[Optional[str]] = mapped_column(
         String(64), nullable=True, index=True
     )
+    rejection_reason: Mapped[Optional[str]] = mapped_column(
+        String(255), nullable=True
+    )
+    accepted_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    rejected_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    preparing_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    ready_for_pickup_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

@@ -184,4 +184,30 @@ def other_customer_headers(other_customer) -> dict:
     return {"Authorization": f"Bearer {token}"}
 
 
+@pytest.fixture
+def sample_delivery_partner(db_session) -> User:
+    """Pre-created Delivery Partner User fixture."""
+    courier = User(
+        id=uuid.uuid4(),
+        full_name="Dave Courier",
+        email="dave.courier@campusbyte.com",
+        phone_number="+1777888999",
+        password_hash=get_password_hash("DaveSecret123"),
+        role=UserRole.DELIVERY_PARTNER,
+        is_active=True,
+    )
+    db_session.add(courier)
+    db_session.commit()
+    db_session.refresh(courier)
+    return courier
+
+
+@pytest.fixture
+def delivery_headers(sample_delivery_partner) -> dict:
+    """Authorization header fixture for sample_delivery_partner."""
+    token, _, _ = create_access_token(sample_delivery_partner.id, sample_delivery_partner.role.value)
+    return {"Authorization": f"Bearer {token}"}
+
+
+
 

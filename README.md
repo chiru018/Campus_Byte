@@ -16,7 +16,9 @@ Campus Byte is a modern, enterprise-grade, full-stack campus food ordering and d
 | **Phase 2** | Database Architecture & Backend Foundation | **Completed** | PostgreSQL 17 + SQLAlchemy 2.0 + Alembic, 9 relational entities, 26 tests passing |
 | **Phase 3** | Authentication, JWT Security, & RBAC | **Completed** | Argon2id hashing, dual-transport JWT, token denylist, role guards, 46 tests passing |
 | **Phase 4** | Complete Restaurant & Menu Management | **Completed** | Owner dashboard, menu catalog, public discovery, IDOR protection, 54 tests passing |
-| **Phase 5** | Customer Ordering, Cart & Campus Delivery Logistics | *Scheduled* | Cart management, order placement, courier dispatch, and live tracking |
+| **Phase 5** | Customer Ordering, Cart & Live Tracking | **Completed** | Persistent cart, single-restaurant rule, checkout, server-side pricing, idempotency, order cancellation, 67 tests passing |
+| **Phase 6** | Restaurant Order Processing & Kitchen Management | **Completed** | Live kitchen order queue, polling alerts, accept/reject workflows, food prep lifecycle, ready-for-pickup handover, 84 tests passing |
+| **Phase 7** | Delivery Partner Dispatch & Courier Logistics | *Upcoming* | Available courier pool, dispatch assignment, pickup confirmation, customer dropoff |
 
 ---
 
@@ -41,7 +43,7 @@ Campus Byte is a modern, enterprise-grade, full-stack campus food ordering and d
 - **Security & Password Hashing:** Argon2id (`argon2-cffi`) with PBKDF2 backward compatibility
 - **Token Authorization:** PyJWT (HS256) with JTI denylisting
 - **Database Migrations:** Alembic
-- **Testing Suite:** Pytest + HTTPX + SQLAlchemy SQLite in-memory runner (67 automated tests passing)
+- **Testing Suite:** Pytest + HTTPX + SQLAlchemy SQLite in-memory runner (84 automated tests passing)
 
 ### Database & Infrastructure
 - **Relational Database:** PostgreSQL 17 (installed locally on port `5432`)
@@ -58,7 +60,9 @@ Campus_Byte/
 │   ├── alembic/
 │   │   ├── versions/
 │   │   │   ├── 20261111_0001_initial_schema.py             # Phase 2: 9 core relational tables
-│   │   │   └── 20261111_0002_add_revoked_tokens_table.py    # Phase 3: Token denylist table
+│   │   │   ├── 20261111_0002_add_revoked_tokens_table.py    # Phase 3: Token denylist table
+│   │   │   ├── 20261111_0003_add_order_idempotency_key.py   # Phase 5: Idempotency token on orders
+│   │   │   └── 20261112_0004_add_restaurant_order_processing_fields.py # Phase 6: Rejection & timeline fields
 │   │   └── env.py
 │   ├── app/
 │   │   ├── api/
@@ -68,6 +72,8 @@ Campus_Byte/
 │   │   │       ├── users.py                                # User CRUD & profile queries
 │   │   │       ├── restaurants.py                          # Restaurant CRUD & availability patch
 │   │   │       ├── menu.py                                 # Menu item CRUD & category filtering
+│   │   │       ├── orders.py                               # Customer checkout, cart submission, cancel
+│   │   │       ├── restaurant_orders.py                    # Restaurant order management, accept/reject, kitchen prep
 │   │   │       └── dashboards.py                           # Aggregate metrics & KPIs
 │   │   ├── core/
 │   │   │   ├── config.py                                   # Pydantic BaseSettings environment manager
@@ -79,6 +85,7 @@ Campus_Byte/
 │   │   │   ├── crud_user.py                                # User persistence logic
 │   │   │   ├── crud_restaurant.py                          # Restaurant persistence logic
 │   │   │   ├── crud_menu.py                                # Menu item persistence logic
+│   │   │   ├── crud_order.py                               # Order lifecycle persistence & locking
 │   │   │   ├── crud_delivery.py                            # Delivery partner profile CRUD
 │   │   │   └── crud_token.py                               # Token revocation & denylist queries
 │   │   ├── db/
@@ -90,6 +97,7 @@ Campus_Byte/
 │   │   │   ├── menu_item.py                                # Menu items (pricing, availability)
 │   │   │   ├── order.py                                    # Order headers & status lifecycles
 │   │   │   ├── order_item.py                               # Order line items & snapshot prices
+│   │   │   ├── order_status_history.py                     # Chronological order status transitions
 │   │   │   ├── delivery.py                                 # Delivery assignments & statuses
 │   │   │   ├── delivery_partner.py                         # Delivery partner vehicle & profile
 │   │   │   ├── address.py                                  # Campus delivery addresses
@@ -100,17 +108,24 @@ Campus_Byte/
 │   │   │   ├── user.py                                     # User request/response schemas
 │   │   │   ├── restaurant.py                               # Restaurant request/response schemas
 │   │   │   ├── menu.py                                     # Menu item schemas
+│   │   │   ├── order.py                                    # Customer & restaurant order schemas
+│   │   │   ├── order_item.py                               # Line item snapshots
 │   │   │   └── dashboard.py                                # System KPI aggregate schemas
 │   │   ├── services/
-│   │   │   └── auth_service.py                             # Atomic user + profile registration & login
+│   │   │   ├── auth_service.py                             # Atomic user + profile registration & login
+│   │   │   ├── restaurant_service.py                       # Restaurant profile business logic
+│   │   │   ├── menu_service.py                             # Menu item management & stock preservation
+│   │   │   └── order_service.py                            # Order placement, price verification, kitchen lifecycle
 │   │   └── main.py                                         # FastAPI app instance, CORS & router registry
 │   ├── tests/
 │   │   ├── conftest.py                                     # Pytest fixtures & isolated SQLite DB engine
 │   │   ├── test_auth_and_rbac.py                           # 20 automated auth, JWT, & RBAC tests
 │   │   ├── test_database.py                                # 5 schema & constraint verification tests
 │   │   ├── test_users.py                                   # 5 user management tests
-│   │   ├── test_restaurants.py                             # 9 restaurant lifecycle tests
-│   │   ├── test_menu.py                                    # 6 menu management tests
+│   │   ├── test_restaurants.py                             # 13 restaurant lifecycle tests
+│   │   ├── test_menu.py                                    # 10 menu management tests
+│   │   ├── test_orders.py                                  # 13 customer ordering tests
+│   │   ├── test_restaurant_orders.py                       # 17 kitchen order processing tests
 │   │   └── test_dashboards.py                              # 1 dashboard KPI test
 │   ├── requirements.txt
 │   ├── alembic.ini
@@ -122,7 +137,8 @@ Campus_Byte/
 │   │   │   ├── navigation/                                 # Navbar with role-based links & Sign Out
 │   │   │   └── layout/                                     # AppLayout shell & Footer
 │   │   ├── context/
-│   │   │   └── AuthContext.jsx                             # Global auth state, session check, login, logout
+│   │   │   ├── AuthContext.jsx                             # Global auth state, session check, login, logout
+│   │   │   └── CartContext.jsx                             # Persistent cart, quantity controls, single-restaurant rule
 │   │   ├── pages/
 │   │   │   ├── public/
 │   │   │   │   ├── LandingPage.jsx                         # Landing page with role sign-up entrypoints
@@ -133,16 +149,30 @@ Campus_Byte/
 │   │   │   │   ├── UnauthorizedPage.jsx                    # 403 Forbidden feedback view
 │   │   │   │   └── Auth.scss                               # Modern glassmorphism authentication styling
 │   │   │   ├── customer/
-│   │   │   │   └── CustomerDashboard.jsx                   # Customer orders & marketplace hub
+│   │   │   │   ├── CustomerDashboard.jsx                   # Customer orders & marketplace hub
+│   │   │   │   ├── CustomerRestaurantsPage.jsx             # Public restaurant browsing & search
+│   │   │   │   ├── CustomerRestaurantDetailPage.jsx        # Menu catalog & add-to-cart
+│   │   │   │   ├── CartPage.jsx                            # Review cart & order summary
+│   │   │   │   ├── CheckoutPage.jsx                        # Campus delivery dorm & submit
+│   │   │   │   ├── OrderConfirmationPage.jsx               # Post-checkout order receipt
+│   │   │   │   ├── MyOrdersPage.jsx                        # Order history with status tags
+│   │   │   │   └── OrderTrackingPage.jsx                   # Live progress tracker & cancellation
 │   │   │   ├── restaurant/
-│   │   │   │   └── RestaurantDashboard.jsx                 # Restaurant owner portal & menu overview
+│   │   │   │   ├── RestaurantDashboard.jsx                 # Restaurant owner portal & menu overview
+│   │   │   │   ├── MenuManagementPage.jsx                  # Dish CRUD & stock toggle
+│   │   │   │   ├── RestaurantOrdersPage.jsx                # Live kitchen orders, stats, polling alerts
+│   │   │   │   └── RestaurantOrderDetailPage.jsx           # Order detail, customer contact, prep buttons
 │   │   │   └── delivery/
 │   │   │       └── DeliveryDashboard.jsx                   # Delivery courier shift & active task hub
 │   │   ├── routes/
 │   │   │   ├── AppRoutes.jsx                               # Declarative React Router DOM tree
 │   │   │   └── ProtectedRoute.jsx                          # Role-based route guard
 │   │   ├── services/
-│   │   │   └── api.js                                      # Axios instance with auth interceptors & authApi
+│   │   │   ├── api.js                                      # Axios instance with auth interceptors & authApi
+│   │   │   ├── restaurantService.js                        # Restaurant API client
+│   │   │   ├── menuService.js                              # Menu API client
+│   │   │   ├── orderService.js                              # Customer ordering & checkout client
+│   │   │   └── restaurantOrderService.js                   # Kitchen order management client
 │   │   └── styles/
 │   │       ├── variables.scss                              # Color palettes, elevation, spacing
 │   │       └── global.scss                                 # Resets and atomic classes

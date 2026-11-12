@@ -73,6 +73,9 @@ export default function Navbar() {
               </Link>
               {user?.role === 'RESTAURANT_OWNER' && (
                 <>
+                  <Link to="/restaurant/orders" className="navbar__link">
+                    Live Orders
+                  </Link>
                   <Link to="/restaurant/menu" className="navbar__link">
                     Menu Catalog
                   </Link>
@@ -259,6 +262,13 @@ export default function Navbar() {
               </Link>
               {user?.role === 'RESTAURANT_OWNER' && (
                 <>
+                  <Link
+                    to="/restaurant/orders"
+                    className="navbar__mobile-link"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Live Orders Management
+                  </Link>
                   <Link
                     to="/restaurant/menu"
                     className="navbar__mobile-link"

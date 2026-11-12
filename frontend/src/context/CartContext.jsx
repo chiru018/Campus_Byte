@@ -210,3 +210,4 @@ export const useCart = () => {
 };
 
 export default CartContext;
+

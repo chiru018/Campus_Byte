@@ -32,6 +32,7 @@ const STAGES = [
   { key: 'PENDING', label: 'Order Placed', desc: 'Sent to restaurant', icon: Clock },
   { key: 'ACCEPTED', label: 'Order Accepted', desc: 'Kitchen acknowledged order', icon: CheckCircle },
   { key: 'PREPARING', label: 'Preparing Food', desc: 'Freshly cooking your meal', icon: ChefHat },
+  { key: 'READY_FOR_PICKUP', label: 'Ready for Pickup', desc: 'Prepared & awaiting courier', icon: PackageCheck },
   { key: 'OUT_FOR_DELIVERY', label: 'Out for Delivery', desc: 'Campus courier en route', icon: Bike },
   { key: 'DELIVERED', label: 'Delivered', desc: 'Arrived at your room', icon: Home },
 ];
@@ -123,10 +124,10 @@ export default function OrderTrackingPage() {
   const isPending = order.order_status === 'PENDING';
 
   // Calculate timeline stage index
-  const stageOrder = ['PENDING', 'ACCEPTED', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED'];
+  const stageOrder = ['PENDING', 'ACCEPTED', 'PREPARING', 'READY_FOR_PICKUP', 'OUT_FOR_DELIVERY', 'DELIVERED'];
   let currentStageIndex = stageOrder.indexOf(order.order_status);
-  if (['READY_FOR_PICKUP', 'PICKED_UP'].includes(order.order_status)) {
-    currentStageIndex = stageOrder.indexOf('PREPARING');
+  if (order.order_status === 'PICKED_UP') {
+    currentStageIndex = stageOrder.indexOf('READY_FOR_PICKUP');
   }
 
   return (
@@ -185,16 +186,29 @@ export default function OrderTrackingPage() {
           </div>
         </div>
 
-        {/* Cancellation Notice Banner */}
+        {/* Cancellation / Rejection Notice Banner */}
         {isCancelled && (
           <div className="cancelled-banner">
             <XCircle size={28} style={{ flexShrink: 0 }} />
             <div>
-              <h3>This order has been cancelled</h3>
-              <p>
+              <h3>
                 {order.order_status === 'REJECTED'
-                  ? 'The restaurant was unable to fulfill your order at this time.'
-                  : 'You have cancelled this order. No payment was charged.'}
+                  ? 'Order Rejected by Restaurant'
+                  : 'This order has been cancelled'}
+              </h3>
+              <p>
+                {order.order_status === 'REJECTED' ? (
+                  <>
+                    <span><strong>Reason:</strong> {order.rejection_reason || 'The restaurant was unable to fulfill this order.'}</span>
+                    {order.rejected_at && (
+                      <span style={{ display: 'block', marginTop: '0.25rem', fontSize: '0.8rem', opacity: 0.85 }}>
+                        Rejected at {new Date(order.rejected_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  'You have cancelled this order. No payment was charged.'
+                )}
               </p>
             </div>
           </div>
@@ -457,3 +471,4 @@ export default function OrderTrackingPage() {
     </div>
   );
 }
+

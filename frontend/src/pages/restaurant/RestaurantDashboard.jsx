@@ -10,6 +10,7 @@ import {
   Info,
   Clock,
   Sparkles,
+  ClipboardList,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import restaurantService from '../../services/restaurantService';
@@ -199,6 +200,29 @@ export default function RestaurantDashboard() {
         <div className="form-card">
           <h3 className="form-card__title">Quick Management Actions</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+            <Link
+              to="/restaurant/orders"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '1.25rem',
+                border: '2px solid #F59E0B',
+                borderRadius: '0.75rem',
+                textDecoration: 'none',
+                color: '#111827',
+                backgroundColor: '#FFFBEB',
+              }}
+            >
+              <div>
+                <strong style={{ color: '#92400E' }}>Live Orders & Kitchen Queue</strong>
+                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.8rem', color: '#B45309' }}>
+                  Accept, reject, and prepare incoming customer orders
+                </p>
+              </div>
+              <ArrowRight size={18} color="#F59E0B" />
+            </Link>
+
             <Link
               to="/restaurant/menu"
               style={{
