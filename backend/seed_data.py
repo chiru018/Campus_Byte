@@ -97,6 +97,7 @@ def seed_database():
             db.flush()
             print(" Created Delivery Partner: courier@campusbyte.com / Courier123")
         else:
+            courier_profile = db.query(DeliveryPartner).filter(DeliveryPartner.user_id == courier_user.id).first()
             print(" Delivery Partner already exists: courier@campusbyte.com")
 
         # 4. Restaurant: Campus Spice Kitchen
@@ -206,16 +207,18 @@ def seed_database():
         if not existing_order:
             order_items_to_add = db.query(MenuItem).filter(MenuItem.restaurant_id == restaurant.id).limit(2).all()
             if order_items_to_add:
-                subtotal = sum(i.price for i in order_items_to_add)
+                from decimal import Decimal
+                subtotal = sum((Decimal(str(i.price)) for i in order_items_to_add), Decimal("0.00"))
+                delivery_fee = Decimal("2.00")
                 demo_order = Order(
                     id=uuid.uuid4(),
                     customer_id=customer.id,
                     restaurant_id=restaurant.id,
-                    delivery_partner_id=delivery_profile.id,
+                    delivery_partner_id=courier_profile.id if courier_profile else None,
                     order_status=OrderStatus.DELIVERED,
                     subtotal=subtotal,
-                    delivery_fee=2.00,
-                    total_amount=subtotal + 2.00,
+                    delivery_fee=delivery_fee,
+                    total_amount=subtotal + delivery_fee,
                     payment_method=PaymentMethod.CASH_ON_DELIVERY,
                     payment_status=PaymentStatus.PAID,
                     delivery_address="Hostel 4, Room 204",

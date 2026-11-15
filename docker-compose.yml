@@ -1,6 +1,6 @@
 services:
-  postgres:
-    image: postgres:17-alpine
+  db:
+    image: postgres:16-alpine
     container_name: campus_byte_postgres
     restart: unless-stopped
     environment:
@@ -17,7 +17,10 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - campus_byte_network
+      campus_byte_network:
+        aliases:
+          - db
+          - postgres
 
   backend:
     build:
@@ -26,20 +29,25 @@ services:
     container_name: campus_byte_backend
     restart: unless-stopped
     depends_on:
-      postgres:
+      db:
         condition: service_healthy
     environment:
       PROJECT_NAME: "Campus Byte API"
       API_VERSION: "v1"
       DEBUG: "false"
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-campus_byte}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-this-secret-in-production-min-32-chars}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-campus_byte}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-dev_super_secret_jwt_key_campus_byte_2026_change_in_production}
       JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
-      BACKEND_CORS_ORIGINS: '["http://localhost","http://localhost:80","http://localhost:5173","http://127.0.0.1:5173","http://localhost:3000"]'
+      BACKEND_CORS_ORIGINS: '["http://localhost","http://localhost:80","http://localhost:5173","http://127.0.0.1:5173","http://localhost:3000","http://127.0.0.1:3000","http://localhost:8000","http://127.0.0.1:8000"]'
     ports:
       - "8000:8000"
-    # No read-only volume mount — entrypoint.sh must be writable/executable inside container
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     networks:
       - campus_byte_network
 
@@ -49,10 +57,12 @@ services:
       dockerfile: Dockerfile
     container_name: campus_byte_frontend
     restart: unless-stopped
-    ports:
-      - "80:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    ports:
+      - "5173:5173"
+      - "80:80"
     networks:
       - campus_byte_network
 

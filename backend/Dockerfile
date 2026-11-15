@@ -1,4 +1,6 @@
-# Dockerfile for Campus Byte FastAPI Backend
+# ============================================================
+# Campus Byte FastAPI Backend — Production Dockerfile
+# ============================================================
 FROM python:3.12-slim
 
 # Set environment variables
@@ -24,12 +26,11 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy application code
 COPY . .
 
-# Make entrypoint executable
-RUN chmod +x entrypoint.sh
+# Ensure Linux LF line endings and execution permissions on entrypoint script
+RUN sed -i 's/\r$//' entrypoint.sh && chmod +x entrypoint.sh
 
-# Expose backend port
+# Expose FastAPI backend port
 EXPOSE 8000
 
-# Run migrations then start server
+# Run migrations, seed verification, then start uvicorn
 CMD ["./entrypoint.sh"]
-

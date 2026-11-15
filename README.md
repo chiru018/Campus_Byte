@@ -132,27 +132,42 @@ Orders transition through a deterministic lifecycle with strict validation rules
 
 ### Option A: Running with Docker Compose (Recommended)
 
-1. Clone the repository and configure the environment:
+Campus Byte is fully containerized with Docker and Docker Compose for zero-friction setup. All three microservices—Frontend (Nginx + React SPA), Backend (FastAPI + Uvicorn), and Database (PostgreSQL 16)—spin up with automated database provisioning, migrations, and demo data seeding.
+
+#### Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (v20+ or Docker 24+, with Docker Compose v2+)
+- On Windows: Docker Desktop with WSL2 backend enabled.
+
+#### 1-Command Startup
 ```bash
+# Clone the repository and configure the environment:
 git clone https://github.com/chiru018/Campus_Byte.git
 cd College_byte
 cp .env.example .env
-```
 
-2. Launch all three containers:
-```bash
-docker compose up -d --build
+# Build and start all three containers in detached mode:
+docker compose up --build -d
 ```
+*Note: The backend entrypoint automatically waits for PostgreSQL health, applies all Alembic database migrations (`alembic upgrade head`), and seeds demo accounts and restaurants!*
 
-3. Seed demo data:
-```bash
-docker compose exec backend python seed_data.py
-```
+#### Essential Docker Lifecycle Commands
+| Operation | Command | Description |
+|---|---|---|
+| **Build & Start Stack** | `docker compose up --build -d` | Builds images, initializes network/volumes, starts all services in background |
+| **Check Container Status** | `docker compose ps` | Displays status and health checks of all containers |
+| **View Live Logs (All Services)** | `docker compose logs -f` | Follows output from frontend, backend, and database |
+| **View Backend Logs** | `docker compose logs -f backend` | Follows FastAPI startup, request logs, and migration output |
+| **View Database Logs** | `docker compose logs -f db` | Inspects PostgreSQL engine logs and readiness |
+| **Restart Services** | `docker compose restart` | Safely restarts containers without losing persistent database data |
+| **Stop All Containers** | `docker compose down` | Gracefully stops and removes containers while preserving `postgres_data` volume |
+| **Stop & Wipe Volume** | `docker compose down -v` | Stops containers and deletes persistent database storage for fresh reset |
 
-4. Access the applications:
-- **Web Application:** `http://localhost`
-- **Backend API Docs:** `http://localhost:8000/docs`
-- **Health Check:** `http://localhost/health`
+#### Access Endpoints
+- **Web Application:** [http://localhost:5173](http://localhost:5173) (also exposed on port 80: [http://localhost](http://localhost))
+- **Backend API Direct:** [http://localhost:8000](http://localhost:8000)
+- **Interactive OpenAPI Docs (Swagger UI):** [http://localhost:8000/docs](http://localhost:8000/docs)
+- **ReDoc Documentation:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
+- **Health Check:** [http://localhost:8000/health](http://localhost:8000/health) or [http://localhost:5173/health](http://localhost:5173/health)
 
 ---
 
