@@ -31,13 +31,28 @@ services:
     environment:
       PROJECT_NAME: "Campus Byte API"
       API_VERSION: "v1"
-      DEBUG: "true"
+      DEBUG: "false"
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-campus_byte}
-      BACKEND_CORS_ORIGINS: '["http://localhost:5173","http://127.0.0.1:5173","http://localhost:3000"]'
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-this-secret-in-production-min-32-chars}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      BACKEND_CORS_ORIGINS: '["http://localhost","http://localhost:80","http://localhost:5173","http://127.0.0.1:5173","http://localhost:3000"]'
     ports:
       - "8000:8000"
-    volumes:
-      - ./backend/app:/app/app:ro
+    # No read-only volume mount — entrypoint.sh must be writable/executable inside container
+    networks:
+      - campus_byte_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: campus_byte_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
     networks:
       - campus_byte_network
 
@@ -48,4 +63,3 @@ volumes:
 networks:
   campus_byte_network:
     driver: bridge
-
