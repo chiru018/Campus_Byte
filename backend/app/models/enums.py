@@ -65,3 +65,20 @@ class DeliveryStatus(str, Enum):
     DELIVERED = "DELIVERED"
     CANCELLED = "CANCELLED"
 
+
+class RefundIssueCategory(str, Enum):
+    MISSING_ITEM = "MISSING_ITEM"
+    INCORRECT_ITEM = "INCORRECT_ITEM"
+    DAMAGED_FOOD = "DAMAGED_FOOD"
+    POOR_QUALITY = "POOR_QUALITY"
+    OTHER = "OTHER"
+
+
+class RefundStatus(str, Enum):
+    PENDING = "PENDING"
+    UNDER_REVIEW = "UNDER_REVIEW"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
+    RESOLVED = "RESOLVED"
+
+

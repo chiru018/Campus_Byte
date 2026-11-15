@@ -1,0 +1,58 @@
+.star-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  &__star,
+  &__star-btn {
+    line-height: 1;
+    font-size: 1.25rem;
+    color: #e2e8f0;
+    transition: color 0.15s ease, transform 0.15s ease;
+    user-select: none;
+  }
+
+  &__star-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+
+    &:hover {
+      transform: scale(1.15);
+    }
+  }
+
+  &__star--filled,
+  &__star-btn--filled {
+    color: #f59e0b; /* Amber 500 */
+  }
+
+  &__star--empty,
+  &__star-btn--empty {
+    color: #cbd5e1;
+  }
+
+  &--sm &__star,
+  &--sm &__star-btn {
+    font-size: 0.95rem;
+  }
+
+  &--md &__star,
+  &--md &__star-btn {
+    font-size: 1.35rem;
+  }
+
+  &--lg &__star,
+  &--lg &__star-btn {
+    font-size: 1.85rem;
+  }
+
+  &__value {
+    margin-left: 0.4rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #334155;
+  }
+}
+

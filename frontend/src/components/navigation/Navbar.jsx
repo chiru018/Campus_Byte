@@ -64,9 +64,14 @@ export default function Navbar() {
           {isAuthenticated ? (
             <>
               {user?.role === 'CUSTOMER' && (
-                <Link to="/my-orders" className="navbar__link">
-                  My Orders
-                </Link>
+                <>
+                  <Link to="/my-orders" className="navbar__link">
+                    My Orders
+                  </Link>
+                  <Link to="/customer/insights" className="navbar__link" style={{ color: '#6366F1', fontWeight: '700' }}>
+                    ✨ AI Insights
+                  </Link>
+                </>
               )}
               <Link to={dashboardPath} className="navbar__link">
                 Dashboard
@@ -75,6 +80,9 @@ export default function Navbar() {
                 <>
                   <Link to="/restaurant/orders" className="navbar__link">
                     Live Orders
+                  </Link>
+                  <Link to="/restaurant/refunds" className="navbar__link">
+                    Refunds
                   </Link>
                   <Link to="/restaurant/menu" className="navbar__link">
                     Menu Catalog
@@ -258,13 +266,23 @@ export default function Navbar() {
                 </span>
               </div>
               {user?.role === 'CUSTOMER' && (
-                <Link
-                  to="/my-orders"
-                  className="navbar__mobile-link"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  My Order History
-                </Link>
+                <>
+                  <Link
+                    to="/my-orders"
+                    className="navbar__mobile-link"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    My Order History
+                  </Link>
+                  <Link
+                    to="/customer/insights"
+                    className="navbar__mobile-link"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{ color: '#6366F1', fontWeight: '700' }}
+                  >
+                    ✨ AI Dining Insights
+                  </Link>
+                </>
               )}
               <Link
                 to={dashboardPath}
@@ -281,6 +299,13 @@ export default function Navbar() {
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Live Orders Management
+                  </Link>
+                  <Link
+                    to="/restaurant/refunds"
+                    className="navbar__mobile-link"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Refund & Dispute Claims
                   </Link>
                   <Link
                     to="/restaurant/menu"

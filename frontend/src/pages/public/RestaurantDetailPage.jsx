@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import restaurantService from '../../services/restaurantService';
 import menuService from '../../services/menuService';
+import reviewService from '../../services/reviewService';
+import StarRating from '../../components/StarRating';
 import { useCart } from '../../context/CartContext';
 import Button from '../../components/common/Button';
 import './Restaurants.scss';
@@ -24,6 +26,7 @@ export default function RestaurantDetailPage() {
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [reviewSummary, setReviewSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -56,6 +59,13 @@ export default function RestaurantDetailPage() {
           category: selectedCategory,
         });
         setMenuItems(menuData.items || []);
+
+        try {
+          const revData = await reviewService.getRestaurantReviews(restaurantId);
+          setReviewSummary(revData);
+        } catch (revErr) {
+          console.warn('Reviews could not be loaded:', revErr);
+        }
       } catch (err) {
         setErrorMsg(err.response?.data?.detail || 'Failed to load restaurant details.');
       } finally {
@@ -118,6 +128,11 @@ export default function RestaurantDetailPage() {
             {restaurant.contact_number && (
               <span className="badge-pill">
                 <Phone size={14} /> {restaurant.contact_number}
+              </span>
+            )}
+            {reviewSummary && (
+              <span className="badge-pill" style={{ backgroundColor: 'rgba(245, 158, 11, 0.25)', color: '#FEF3C7' }}>
+                ⭐ {reviewSummary.average_rating > 0 ? reviewSummary.average_rating.toFixed(1) : 'New'} ({reviewSummary.total_reviews} {reviewSummary.total_reviews === 1 ? 'review' : 'reviews'})
               </span>
             )}
             <span
@@ -264,6 +279,70 @@ export default function RestaurantDetailPage() {
               );
             })}
           </div>
+        )}
+
+        {/* Phase 9: Ratings & Customer Reviews Section */}
+        {reviewSummary && (
+          <section className="restaurant-reviews-section">
+            <h2 className="section-title">
+              ⭐ Customer Ratings & Reviews
+            </h2>
+
+            <div className="reviews-overview">
+              <div className="rating-score-box">
+                <div className="score-number">
+                  {reviewSummary.average_rating > 0 ? reviewSummary.average_rating.toFixed(1) : '—'}
+                </div>
+                <StarRating rating={reviewSummary.average_rating} readonly size="md" />
+                <div className="score-sub">
+                  Based on {reviewSummary.total_reviews} verified {reviewSummary.total_reviews === 1 ? 'review' : 'reviews'}
+                </div>
+              </div>
+
+              <div className="distribution-bars">
+                {[5, 4, 3, 2, 1].map((stars) => {
+                  const count = reviewSummary.rating_distribution?.[String(stars)] || 0;
+                  const pct = reviewSummary.total_reviews > 0 ? (count / reviewSummary.total_reviews) * 100 : 0;
+                  return (
+                    <div key={stars} className="dist-row">
+                      <span className="star-label">{stars} star</span>
+                      <div className="bar-track">
+                        <div className="bar-fill" style={{ width: `${pct}%` }} />
+                      </div>
+                      <span className="count-label">{count}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="reviews-stream">
+              {reviewSummary.reviews && reviewSummary.reviews.length > 0 ? (
+                reviewSummary.reviews.map((rev) => (
+                  <div key={rev.id} className="review-card">
+                    <div className="review-header">
+                      <div>
+                        <span className="reviewer-name">{rev.customer_name || 'Campus Student'}</span>
+                        <div className="review-date">
+                          {new Date(rev.created_at).toLocaleDateString([], {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                        </div>
+                      </div>
+                      <StarRating rating={rev.rating} readonly size="sm" showValue />
+                    </div>
+                    {rev.comment && <p className="review-text">"{rev.comment}"</p>}
+                  </div>
+                ))
+              ) : (
+                <p style={{ color: '#64748B', textAlign: 'center', padding: '1.5rem 0', fontStyle: 'italic' }}>
+                  No customer reviews yet. Be the first to order and review {restaurant.name}!
+                </p>
+              )}
+            </div>
+          </section>
         )}
       </div>
 

@@ -194,6 +194,80 @@ def seed_database():
                 print(f" Added Menu Item: {item_data['name']} (${item_data['price']})")
 
         db.commit()
+
+        # 5. Phase 9 Demo: Delivered Order, Review, and Refund Request
+        from app.models.order import Order
+        from app.models.order_item import OrderItem
+        from app.models.review import Review
+        from app.models.refund_request import RefundRequest
+        from app.models.enums import OrderStatus, PaymentStatus, PaymentMethod, RefundIssueCategory, RefundStatus
+
+        existing_order = db.query(Order).filter(Order.customer_id == customer.id).first()
+        if not existing_order:
+            order_items_to_add = db.query(MenuItem).filter(MenuItem.restaurant_id == restaurant.id).limit(2).all()
+            if order_items_to_add:
+                subtotal = sum(i.price for i in order_items_to_add)
+                demo_order = Order(
+                    id=uuid.uuid4(),
+                    customer_id=customer.id,
+                    restaurant_id=restaurant.id,
+                    delivery_partner_id=delivery_profile.id,
+                    order_status=OrderStatus.DELIVERED,
+                    subtotal=subtotal,
+                    delivery_fee=2.00,
+                    total_amount=subtotal + 2.00,
+                    payment_method=PaymentMethod.CASH_ON_DELIVERY,
+                    payment_status=PaymentStatus.PAID,
+                    delivery_address="Hostel 4, Room 204",
+                    cod_collected=True,
+                )
+                db.add(demo_order)
+                db.flush()
+
+                for m_item in order_items_to_add:
+                    oi = OrderItem(
+                        id=uuid.uuid4(),
+                        order_id=demo_order.id,
+                        menu_item_id=m_item.id,
+                        item_name=m_item.name,
+                        unit_price=m_item.price,
+                        quantity=1,
+                        total_price=m_item.price,
+                    )
+                    db.add(oi)
+
+                # Seed Demo Review
+                demo_review = Review(
+                    id=uuid.uuid4(),
+                    customer_id=customer.id,
+                    restaurant_id=restaurant.id,
+                    order_id=demo_order.id,
+                    rating=5,
+                    comment="Outstanding butter chicken and warm naan! Arrived steaming hot and fresh.",
+                )
+                db.add(demo_review)
+
+                print(" Created Delivered Demo Order with 5-Star Customer Review")
+
+        # Check for demo refund dispute
+        delivered_order = db.query(Order).filter(Order.customer_id == customer.id, Order.order_status == OrderStatus.DELIVERED).first()
+        if delivered_order:
+            existing_refund = db.query(RefundRequest).filter(RefundRequest.order_id == delivered_order.id).first()
+            if not existing_refund:
+                demo_refund = RefundRequest(
+                    id=uuid.uuid4(),
+                    order_id=delivered_order.id,
+                    customer_id=customer.id,
+                    restaurant_id=restaurant.id,
+                    issue_category=RefundIssueCategory.MISSING_ITEM.value,
+                    description="The beverage was missing from the meal delivery parcel.",
+                    requested_amount=2.50,
+                    status=RefundStatus.PENDING.value,
+                )
+                db.add(demo_refund)
+                print(" Created Sample Pending Refund Request for Kitchen Management")
+
+        db.commit()
         print("\n [SUCCESS] Seed data completed successfully!")
         print("\nDemo Credentials:")
         print("  Customer:         student@campusbyte.com   / Student123")

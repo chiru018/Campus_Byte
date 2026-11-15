@@ -66,6 +66,26 @@ from app.schemas.auth import (
     TokenResponse,
     AuthMeResponse,
 )
+from app.schemas.review import (
+    ReviewCreate,
+    ReviewUpdate,
+    ReviewResponse,
+    RestaurantReviewSummary,
+)
+from app.schemas.refund import (
+    RefundRequestCreate,
+    RefundApproveRequest,
+    RefundRejectRequest,
+    RefundResolveRequest,
+    RefundRequestResponse,
+    RefundListResponse,
+)
+from app.schemas.insights import (
+    SpendingSummaryResponse,
+    OrderingPatternsResponse,
+    RecommendationsResponse,
+    AiNarrativeResponse,
+)
 
 __all__ = [
     "CustomerRegisterRequest",
@@ -117,5 +137,19 @@ __all__ = [
     "CODStatusResponse",
     "DeliveryHistoryItemResponse",
     "DeliveryHistoryListResponse",
+    "ReviewCreate",
+    "ReviewUpdate",
+    "ReviewResponse",
+    "RestaurantReviewSummary",
+    "RefundRequestCreate",
+    "RefundApproveRequest",
+    "RefundRejectRequest",
+    "RefundResolveRequest",
+    "RefundRequestResponse",
+    "RefundListResponse",
+    "SpendingSummaryResponse",
+    "OrderingPatternsResponse",
+    "RecommendationsResponse",
+    "AiNarrativeResponse",
 ]
 

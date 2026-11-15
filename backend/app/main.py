@@ -15,6 +15,9 @@ from app.api.routers import (
     dashboards,
     system,
     protected_routes,
+    reviews,
+    refunds,
+    insights,
 )
 
 # Application initialization
@@ -70,6 +73,9 @@ app.include_router(restaurant_orders.router, prefix="/api")
 app.include_router(delivery.router, prefix="/api")
 app.include_router(users.router, prefix="/api")
 app.include_router(dashboards.router, prefix="/api")
+app.include_router(reviews.router, prefix="/api")
+app.include_router(refunds.router, prefix="/api")
+app.include_router(insights.router, prefix="/api")
 app.include_router(system.router, prefix="/api/v1")
 
 

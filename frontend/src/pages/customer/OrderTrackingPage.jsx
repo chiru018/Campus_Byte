@@ -14,8 +14,11 @@ import {
   Banknote,
   RefreshCw,
   Loader2,
+  Star,
 } from 'lucide-react';
 import orderService from '../../services/orderService';
+import reviewService from '../../services/reviewService';
+import StarRating from '../../components/StarRating';
 import Button from '../../components/common/Button';
 import './Orders.scss';
 
@@ -50,6 +53,14 @@ export default function OrderTrackingPage() {
   const [cancelReason, setCancelReason] = useState('');
   const [cancelling, setCancelling] = useState(false);
   const [cancelError, setCancelError] = useState('');
+
+  // Review Modal State
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [reviewError, setReviewError] = useState('');
 
   const fetchOrderDetails = async (isManual = false) => {
     if (isManual) setRefreshing(true);
@@ -92,6 +103,27 @@ export default function OrderTrackingPage() {
       setCancelError(err.response?.data?.detail || 'Failed to cancel order.');
     } finally {
       setCancelling(false);
+    }
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!order) return;
+    setReviewSubmitting(true);
+    setReviewError('');
+    try {
+      await reviewService.submitReview({
+        order_id: order.id,
+        restaurant_id: order.restaurant_id,
+        rating: reviewRating,
+        comment: reviewComment.trim() || undefined,
+      });
+      setReviewSuccess(true);
+      setShowReviewModal(false);
+    } catch (err) {
+      setReviewError(err.response?.data?.detail || 'Failed to submit review.');
+    } finally {
+      setReviewSubmitting(false);
     }
   };
 
@@ -270,6 +302,45 @@ export default function OrderTrackingPage() {
 
           {/* Right: Order Summary & Delivery Details */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {/* Phase 9: Delivered Order Review Callout */}
+            {order.order_status === 'DELIVERED' && (
+              <div
+                style={{
+                  background: '#FEF3C7',
+                  borderRadius: '1rem',
+                  border: '1px solid #FCD34D',
+                  padding: '1.25rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '1rem',
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#92400E', fontWeight: '800', fontSize: '0.95rem' }}>
+                    <Star size={18} fill="#F59E0B" color="#F59E0B" />
+                    <span>How was your meal?</span>
+                  </div>
+                  <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: '#78350F' }}>
+                    {reviewSuccess
+                      ? 'Thank you! Your verified review has been submitted.'
+                      : `Rate your food from ${order.restaurant_name || 'the kitchen'}.`}
+                  </p>
+                </div>
+                {!reviewSuccess && (
+                  <Button
+                    variant="primary"
+                    size="small"
+                    icon={Star}
+                    onClick={() => setShowReviewModal(true)}
+                  >
+                    Submit Review
+                  </Button>
+                )}
+              </div>
+            )}
+
             {/* Courier Info Card (shown when assigned) */}
             {order.delivery_partner_name && (
               <div
@@ -520,6 +591,55 @@ export default function OrderTrackingPage() {
                 )}
               </Button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Review Modal */}
+      {showReviewModal && (
+        <div className="order-modal-overlay">
+          <div className="order-modal-box">
+            <h3>Review Your Meal</h3>
+            <p className="modal-subtitle">
+              Order #{order.id.substring(0, 8).toUpperCase()} • {order.restaurant_name}
+            </p>
+
+            {reviewError && (
+              <div style={{ background: '#FEF2F2', color: '#991B1B', padding: '0.75rem', borderRadius: '0.5rem', marginBottom: '1rem', fontSize: '0.85rem' }}>
+                {reviewError}
+              </div>
+            )}
+
+            <form onSubmit={handleReviewSubmit}>
+              <div className="form-group" style={{ textAlign: 'center', padding: '1rem 0' }}>
+                <label style={{ marginBottom: '0.75rem' }}>Your Rating</label>
+                <StarRating
+                  rating={reviewRating}
+                  onChange={(val) => setReviewRating(val)}
+                  size="lg"
+                  showValue
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Review Comment (Optional)</label>
+                <textarea
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="How was the food quality, taste, and packaging?"
+                  maxLength={1000}
+                />
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" type="button" onClick={() => setShowReviewModal(false)}>
+                  Cancel
+                </Button>
+                <Button variant="primary" type="submit" disabled={reviewSubmitting}>
+                  {reviewSubmitting ? 'Submitting...' : 'Submit Review'}
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
       )}

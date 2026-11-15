@@ -7,6 +7,8 @@ from app.models.enums import (
     PaymentMethod,
     PaymentStatus,
     DeliveryStatus,
+    RefundIssueCategory,
+    RefundStatus,
 )
 from app.models.user import User
 from app.models.restaurant import Restaurant
@@ -17,6 +19,8 @@ from app.models.order_item import OrderItem
 from app.models.delivery_assignment import DeliveryAssignment
 from app.models.order_status_history import OrderStatusHistory
 from app.models.revoked_token import RevokedToken
+from app.models.review import Review
+from app.models.refund_request import RefundRequest
 
 __all__ = [
     "UserRole",
@@ -27,6 +31,8 @@ __all__ = [
     "PaymentMethod",
     "PaymentStatus",
     "DeliveryStatus",
+    "RefundIssueCategory",
+    "RefundStatus",
     "User",
     "Restaurant",
     "MenuItem",
@@ -36,5 +42,7 @@ __all__ = [
     "DeliveryAssignment",
     "OrderStatusHistory",
     "RevokedToken",
+    "Review",
+    "RefundRequest",
 ]
 

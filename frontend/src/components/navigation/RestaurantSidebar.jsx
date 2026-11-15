@@ -6,6 +6,7 @@ import {
   UtensilsCrossed,
   PlusCircle,
   ClipboardList,
+  ShieldAlert,
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -65,6 +66,16 @@ export default function RestaurantSidebar({ restaurantName, isOpen, pendingCount
               </span>
             )}
           </span>
+        </NavLink>
+
+        <NavLink
+          to="/restaurant/refunds"
+          className={({ isActive }) =>
+            `restaurant-sidebar__link ${isActive ? 'active' : ''}`
+          }
+        >
+          <ShieldAlert size={18} />
+          <span>Refund Requests</span>
         </NavLink>
 
         <NavLink

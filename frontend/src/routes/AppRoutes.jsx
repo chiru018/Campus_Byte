@@ -17,6 +17,7 @@ import CheckoutPage from '../pages/customer/CheckoutPage';
 import OrderConfirmationPage from '../pages/customer/OrderConfirmationPage';
 import MyOrdersPage from '../pages/customer/MyOrdersPage';
 import OrderTrackingPage from '../pages/customer/OrderTrackingPage';
+import CustomerInsightsPage from '../pages/customer/CustomerInsightsPage';
 
 import RestaurantDashboard from '../pages/restaurant/RestaurantDashboard';
 import RestaurantProfilePage from '../pages/restaurant/RestaurantProfilePage';
@@ -25,6 +26,7 @@ import RestaurantOrderDetailPage from '../pages/restaurant/RestaurantOrderDetail
 import MenuManagementPage from '../pages/restaurant/MenuManagementPage';
 import AddMenuItemPage from '../pages/restaurant/AddMenuItemPage';
 import EditMenuItemPage from '../pages/restaurant/EditMenuItemPage';
+import RestaurantRefundsPage from '../pages/restaurant/RestaurantRefundsPage';
 import DeliveryDashboard from '../pages/delivery/DeliveryDashboard';
 import DeliveryAvailableOrdersPage from '../pages/delivery/DeliveryAvailableOrdersPage';
 import DeliveryActivePage from '../pages/delivery/DeliveryActivePage';
@@ -50,6 +52,8 @@ export default function AppRoutes() {
         {/* Customer Protected Routes */}
         <Route element={<ProtectedRoute allowedRoles={['CUSTOMER']} />}>
           <Route path="/customer/dashboard" element={<CustomerDashboard />} />
+          <Route path="/customer/insights" element={<CustomerInsightsPage />} />
+          <Route path="/insights" element={<CustomerInsightsPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/order-confirmation/:orderId" element={<OrderConfirmationPage />} />
           <Route path="/my-orders" element={<MyOrdersPage />} />
@@ -61,6 +65,7 @@ export default function AppRoutes() {
           <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
           <Route path="/restaurant/orders" element={<RestaurantOrdersPage />} />
           <Route path="/restaurant/orders/:orderId" element={<RestaurantOrderDetailPage />} />
+          <Route path="/restaurant/refunds" element={<RestaurantRefundsPage />} />
           <Route path="/restaurant/profile" element={<RestaurantProfilePage />} />
           <Route path="/restaurant/menu" element={<MenuManagementPage />} />
           <Route path="/restaurant/menu/add" element={<AddMenuItemPage />} />

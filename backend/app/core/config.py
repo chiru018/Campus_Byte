@@ -29,6 +29,10 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000",
     ]
 
+    # AI & Gemini Settings
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.5-flash"
+
     model_config = SettingsConfigDict(
         env_file=(".env", "backend/.env"),
         env_file_encoding="utf-8",

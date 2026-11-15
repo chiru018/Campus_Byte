@@ -480,6 +480,136 @@
       color: #B91C1C;
     }
   }
+
+  /* Phase 9 Review & Refund Modals & Cards */
+  .order-action-btns {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .order-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+  }
+
+  .order-modal-box {
+    background: #FFFFFF;
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+
+    h3 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0F172A;
+      margin-bottom: 0.25rem;
+    }
+
+    .modal-subtitle {
+      font-size: 0.875rem;
+      color: #64748B;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+
+      label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.4rem;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 0.65rem 0.85rem;
+        border: 1px solid #CBD5E1;
+        border-radius: 0.5rem;
+        font-size: 0.95rem;
+
+        &:focus {
+          outline: none;
+          border-color: #F59E0B;
+        }
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 90px;
+      }
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+  }
+
+  .review-item-card,
+  .refund-item-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 0.85rem;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+
+      h4 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #0F172A;
+        margin: 0;
+      }
+
+      .item-date {
+        font-size: 0.8rem;
+        color: #64748B;
+      }
+    }
+
+    .item-body {
+      color: #334155;
+      font-size: 0.925rem;
+      line-height: 1.5;
+      margin-bottom: 0.75rem;
+    }
+
+    .item-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #64748B;
+      border-top: 1px solid #F1F5F9;
+      padding-top: 0.5rem;
+    }
+  }
 }
 
 @keyframes pulse-ring {
